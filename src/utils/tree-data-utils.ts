@@ -798,6 +798,7 @@ export const insertNode = ({
   depth: targetDepth,
   minimumTreeIndex,
   newNode,
+  draggedNodes,
   getNodeKey,
   ignoreCollapsed = true,
   expandParent = false,
@@ -809,6 +810,40 @@ export const insertNode = ({
   expandParent?: boolean | undefined
   getNodeKey: GetNodeKeyFunction
 }): FullTree & TreeIndex & TreePath & { parentNode: TreeItem | null } => {
+  let multipleNodesTree = [...treeData]
+  let multipleNodesInsertResult
+
+  if (draggedNodes) {
+    for (const draggedNodeInfo of draggedNodes) {
+      const insertResult = addNodeAtDepthAndIndex({
+        targetDepth,
+        minimumTreeIndex,
+        newNode: draggedNodeInfo.node,
+        ignoreCollapsed,
+        expandParent,
+        getNodeKey,
+        isPseudoRoot: true,
+        isLastChild: true,
+        node: { children: multipleNodesTree },
+        currentIndex: -1,
+        currentDepth: -1,
+      })
+
+      multipleNodesTree = insertResult.node.children
+      multipleNodesInsertResult = insertResult
+    }
+    const treeIndex = multipleNodesInsertResult.insertedTreeIndex
+    return {
+      treeData: multipleNodesInsertResult.node.children,
+      treeIndex,
+      path: [
+        ...multipleNodesInsertResult.parentPath,
+        getNodeKey({ node: newNode, treeIndex }),
+      ],
+      parentNode: multipleNodesInsertResult.parentNode,
+    }
+  }
+
   if (!treeData && targetDepth === 0) {
     return {
       treeData: [newNode],

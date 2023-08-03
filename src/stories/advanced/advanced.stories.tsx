@@ -8,6 +8,7 @@ import GenerateNodePropsExample from './generate-node-props'
 import OnlyExpandSearchedNodesExample from './only-expand-searched-node'
 import TouchSupportExample from './touch-support'
 import TreeToTreeExample from './tree-to-tree'
+import SelectMultiple from './select-multiple'
 
 const meta: Meta<typeof ExternalNodeExample> = {
   title: "Advanced",
@@ -48,4 +49,8 @@ export const PreventSomeNodesFromHavingChildren: Story = {
 
 export const MinimalImplementationWithoutDndContext: Story = {
   render: () => <BarebonesExampleNoContext />,
+};
+
+export const SelectMultipleNodes: Story = {
+  render: () => <SelectMultiple />,
 };

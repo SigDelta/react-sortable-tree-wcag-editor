@@ -4,6 +4,7 @@ import { classnames } from './utils/classnames'
 import { isDescendant } from './utils/tree-data-utils'
 import './node-renderer-default.css'
 import { NodeData, TreeItem } from '.'
+import { arePathsEqual } from './utils/generic-utils'
 
 const defaultProps = {
   isSearchMatch: false,
@@ -43,11 +44,15 @@ export interface NodeRendererProps {
   listIndex: number
   treeId: string
   rowDirection?: 'ltr' | 'rtl' | string | undefined
+  selectedNodesPathList: [] | number[][]
 
   connectDragPreview: ConnectDragPreview
   connectDragSource: ConnectDragSource
+  updateSelectedNodesPathList: (
+    inputFn: (pathList: number[][]) => number[][]
+  ) => void
   parentNode?: TreeItem | undefined
-  startDrag: ({ path }: { path: number[] }) => void
+  startDrag: ({ path }: { path: number[] | number[][] }) => void
   endDrag: (dropResult: unknown) => void
   isDragging: boolean
   didDrop: boolean
@@ -83,11 +88,18 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     isOver: _isOver, // Not needed, but preserved for other renderers
     parentNode: _parentNode, // Needed for dndManager
     rowDirection,
+    updateSelectedNodesPathList,
+    selectedNodesPathList,
     ...otherProps
   } = props
   const nodeTitle = title || node.title
   const nodeSubtitle = subtitle || node.subtitle
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
+  const isSelected =
+    selectedNodesPathList &&
+    selectedNodesPathList.some((selectedNodePath) =>
+      arePathsEqual(path, selectedNodePath)
+    )
 
   let handle
   if (canDrag) {
@@ -122,7 +134,18 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   }
 
   return (
-    <div style={{ height: '100%' }} {...otherProps}>
+    <div
+      style={{ height: '100%' }}
+      {...otherProps}
+      onClick={() => {
+        updateSelectedNodesPathList((prevPathList) => {
+          return isSelected
+            ? prevPathList.filter(
+                (selectedPath) => !arePathsEqual(selectedPath, path)
+              )
+            : [...prevPathList, path]
+        })
+      }}>
       {toggleChildrenVisibility &&
         node.children &&
         (node.children.length > 0 || typeof node.children === 'function') && (
@@ -179,6 +202,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               className={classnames(
                 'rst__rowContents',
                 canDrag ? '' : 'rst__rowContentsDragDisabled',
+                isSelected ? 'rst__rowContentsSelected' : '',
                 rowDirectionClass ?? ''
               )}>
               <div

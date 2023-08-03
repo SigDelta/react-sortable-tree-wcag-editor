@@ -104,6 +104,10 @@
   border-left: solid #bbb 1px;
 }
 
+.rst__rowContentsSelected {
+  background-color: rgb(196, 236, 255);
+}
+
 .rst__rowLabel {
   flex: 0 1 auto;
   padding-right: 20px;
