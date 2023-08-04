@@ -15,17 +15,3 @@ export const slideRows = (
     ...rowsWithoutMoved.slice(toIndex),
   ]
 }
-
-export function arePathsEqual(path1: number[], path2: number[]): boolean {
-  if (path1.length !== path2.length) {
-    return false
-  }
-
-  for (const [i, element] of path1.entries()) {
-    if (element !== path2[i]) {
-      return false
-    }
-  }
-
-  return true
-}

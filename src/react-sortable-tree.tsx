@@ -233,7 +233,7 @@ class ReactSortableTree extends Component {
       searchMatches: [],
       searchFocusTreeIndex: undefined,
       dragging: false,
-      selectedNodesPathList: [],
+      selectedNodes: [],
 
       // props that need to be used in gDSFP or static functions will be stored here
       instanceProps: {
@@ -265,8 +265,7 @@ class ReactSortableTree extends Component {
     this.endDrag = this.endDrag.bind(this)
     this.drop = this.drop.bind(this)
     this.handleDndMonitorChange = this.handleDndMonitorChange.bind(this)
-    this.handleUpdateSelectedNodesPathList =
-      this.handleUpdateSelectedNodesPathList.bind(this)
+    this.handleUpdateSelectedNodes = this.handleUpdateSelectedNodes.bind(this)
   }
 
   componentDidMount() {
@@ -366,9 +365,9 @@ class ReactSortableTree extends Component {
     }
   }
 
-  handleUpdateSelectedNodesPathList(inputFn) {
-    const selectedNodesPathList = inputFn(this.state.selectedNodesPathList)
-    this.setState((prevState) => ({ ...prevState, selectedNodesPathList }))
+  handleUpdateSelectedNodes(inputFn) {
+    const selectedNodes = inputFn(this.state.selectedNodes)
+    this.setState((prevState) => ({ ...prevState, selectedNodes }))
   }
 
   getRows(treeData) {
@@ -381,7 +380,7 @@ class ReactSortableTree extends Component {
 
   startDrag = ({ path }) => {
     this.setState((prevState) => {
-      const multipleNodes = prevState.selectedNodesPathList.length > 0
+      const multipleNodes = prevState.selectedNodes.length > 0
 
       const removeNodeAtPath = (treeData, nodePath) => {
         return removeNode({
@@ -397,15 +396,16 @@ class ReactSortableTree extends Component {
         let draggedMinimumTreeIndex
         let draggedDepth
 
-        for (const nodePath of prevState.selectedNodesPathList) {
+        for (const selectedNode of prevState.selectedNodes) {
           const { treeData, node, treeIndex } = removeNodeAtPath(
             draggingTreeData,
-            nodePath
+            selectedNode.path
           )
+
           draggingTreeData = treeData
           draggedNode = draggedNode || node
           draggedMinimumTreeIndex = draggedMinimumTreeIndex || treeIndex
-          draggedDepth = draggedDepth || nodePath.length - 1
+          draggedDepth = draggedDepth || selectedNode.path.length - 1
         }
 
         return {
@@ -446,54 +446,52 @@ class ReactSortableTree extends Component {
       return
     }
 
-    this.setState(
-      ({ draggingTreeData, instanceProps, selectedNodesPathList }) => {
-        // Fall back to the tree data if something is being dragged in from
-        //  an external element
-        const newDraggingTreeData = draggingTreeData || instanceProps.treeData
+    this.setState(({ draggingTreeData, instanceProps, selectedNodes }) => {
+      // Fall back to the tree data if something is being dragged in from
+      //  an external element
+      const newDraggingTreeData = draggingTreeData || instanceProps.treeData
 
-        const draggedNodes =
-          selectedNodesPathList.length > 0
-            ? selectedNodesPathList.map((nodePath) => {
-                return getNodeAtPath({
-                  treeData: instanceProps.treeData,
-                  path: nodePath,
-                  getNodeKey: this.props.getNodeKey,
-                })
+      const draggedNodes =
+        selectedNodes.length > 0
+          ? selectedNodes.map((selectedNode) => {
+              return getNodeAtPath({
+                treeData: instanceProps.treeData,
+                path: selectedNode.path,
+                getNodeKey: this.props.getNodeKey,
               })
-            : undefined
+            })
+          : undefined
 
-        const addedResult = memoizedInsertNode({
+      const addedResult = memoizedInsertNode({
+        treeData: newDraggingTreeData,
+        newNode: draggedNode,
+        draggedNodes,
+        depth: draggedDepth,
+        minimumTreeIndex: draggedMinimumTreeIndex,
+        expandParent: true,
+        getNodeKey: this.props.getNodeKey,
+      })
+
+      const rows = this.getRows(addedResult.treeData)
+      const expandedParentPath = rows[addedResult.treeIndex].path
+
+      return {
+        draggedNode,
+        draggedDepth,
+        draggedMinimumTreeIndex,
+        draggingTreeData: changeNodeAtPath({
           treeData: newDraggingTreeData,
-          newNode: draggedNode,
-          draggedNodes,
-          depth: draggedDepth,
-          minimumTreeIndex: draggedMinimumTreeIndex,
-          expandParent: true,
+          path: expandedParentPath.slice(0, -1),
+          newNode: ({ node }) => ({ ...node, expanded: true }),
           getNodeKey: this.props.getNodeKey,
-        })
-
-        const rows = this.getRows(addedResult.treeData)
-        const expandedParentPath = rows[addedResult.treeIndex].path
-
-        return {
-          draggedNode,
-          draggedDepth,
-          draggedMinimumTreeIndex,
-          draggingTreeData: changeNodeAtPath({
-            treeData: newDraggingTreeData,
-            path: expandedParentPath.slice(0, -1),
-            newNode: ({ node }) => ({ ...node, expanded: true }),
-            getNodeKey: this.props.getNodeKey,
-          }),
-          // reset the scroll focus so it doesn't jump back
-          // to a search result while dragging
-          searchFocusTreeIndex: undefined,
-          dragging: true,
-          draggedNodes: draggedNodes || [],
-        }
+        }),
+        // reset the scroll focus so it doesn't jump back
+        // to a search result while dragging
+        searchFocusTreeIndex: undefined,
+        dragging: true,
+        draggedNodes: draggedNodes || [],
       }
-    )
+    })
   }
 
   endDrag = (dropResult) => {
@@ -678,8 +676,9 @@ class ReactSortableTree extends Component {
           isSearchFocus={isSearchFocus}
           canDrag={rowCanDrag}
           toggleChildrenVisibility={this.toggleChildrenVisibility}
-          updateSelectedNodesPathList={this.handleUpdateSelectedNodesPathList}
-          selectedNodesPathList={this.state.selectedNodesPathList}
+          updateSelectedNodes={this.handleUpdateSelectedNodes}
+          selectedNodes={this.state.selectedNodes}
+          getNodeKey={this.props.getNodeKey}
           {...sharedProps}
           {...nodeProps}
         />

@@ -4,7 +4,6 @@ import { classnames } from './utils/classnames'
 import { isDescendant } from './utils/tree-data-utils'
 import './node-renderer-default.css'
 import { NodeData, TreeItem } from '.'
-import { arePathsEqual } from './utils/generic-utils'
 
 const defaultProps = {
   isSearchMatch: false,
@@ -44,12 +43,12 @@ export interface NodeRendererProps {
   listIndex: number
   treeId: string
   rowDirection?: 'ltr' | 'rtl' | string | undefined
-  selectedNodesPathList: [] | number[][]
+  selectedNodes: TreeItem[]
 
   connectDragPreview: ConnectDragPreview
   connectDragSource: ConnectDragSource
-  updateSelectedNodesPathList: (
-    inputFn: (pathList: number[][]) => number[][]
+  updateSelectedNodes: (
+    inputFn: (selectedNodes: TreeItem[]) => TreeItem[]
   ) => void
   parentNode?: TreeItem | undefined
   startDrag: ({ path }: { path: number[] | number[][] }) => void
@@ -88,18 +87,20 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     isOver: _isOver, // Not needed, but preserved for other renderers
     parentNode: _parentNode, // Needed for dndManager
     rowDirection,
-    updateSelectedNodesPathList,
-    selectedNodesPathList,
+    updateSelectedNodes,
+    selectedNodes,
+    getNodeKey,
     ...otherProps
   } = props
   const nodeTitle = title || node.title
   const nodeSubtitle = subtitle || node.subtitle
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
-  const isSelected =
-    selectedNodesPathList &&
-    selectedNodesPathList.some((selectedNodePath) =>
-      arePathsEqual(path, selectedNodePath)
-    )
+  const nodeKey = getNodeKey({ node })
+  const parentKey = _parentNode ? getNodeKey({ node: _parentNode }) : null
+  const isSelected = selectedNodes.some((selectedNode) => {
+    const selectedNodeKey = getNodeKey({ node: selectedNode })
+    return selectedNodeKey === nodeKey || selectedNodeKey === parentKey
+  })
 
   let handle
   if (canDrag) {
@@ -138,12 +139,13 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
       style={{ height: '100%' }}
       {...otherProps}
       onClick={() => {
-        updateSelectedNodesPathList((prevPathList) => {
+        updateSelectedNodes((prevNodesList) => {
           return isSelected
-            ? prevPathList.filter(
-                (selectedPath) => !arePathsEqual(selectedPath, path)
+            ? prevNodesList.filter(
+                (selectedNode) =>
+                  !(getNodeKey({ node: selectedNode }) === nodeKey)
               )
-            : [...prevPathList, path]
+            : [...prevNodesList, { ...node, path }]
         })
       }}>
       {toggleChildrenVisibility &&
