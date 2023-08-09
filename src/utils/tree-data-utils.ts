@@ -813,7 +813,7 @@ export const insertNode = ({
   let multipleNodesTree = [...treeData]
   let multipleNodesInsertResult
 
-  if (draggedNodes) {
+  if (draggedNodes && draggedNodes.length > 0) {
     for (const draggedNodeInfo of draggedNodes) {
       const insertResult = addNodeAtDepthAndIndex({
         targetDepth,

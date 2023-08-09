@@ -378,7 +378,7 @@ class ReactSortableTree extends Component {
     })
   }
 
-  startDrag = ({ path }) => {
+  startDrag = ({ path, node, ...more }) => {
     this.setState((prevState) => {
       const multipleNodes = prevState.selectedNodes.length > 0
 
@@ -392,27 +392,24 @@ class ReactSortableTree extends Component {
 
       if (multipleNodes) {
         let draggingTreeData = prevState.instanceProps.treeData
-        let draggedNode
-        let draggedMinimumTreeIndex
+        const draggedNode = node
         let draggedDepth
 
         for (const selectedNode of prevState.selectedNodes) {
-          const { treeData, node, treeIndex } = removeNodeAtPath(
+          const { treeData } = removeNodeAtPath(
             draggingTreeData,
             selectedNode.path
           )
 
           draggingTreeData = treeData
-          draggedNode = draggedNode || node
-          draggedMinimumTreeIndex = draggedMinimumTreeIndex || treeIndex
-          draggedDepth = draggedDepth || selectedNode.path.length - 1
+          draggedDepth = draggedDepth ?? selectedNode.path.length - 1
         }
 
         return {
           draggingTreeData,
           draggedNode,
           draggedDepth,
-          draggedMinimumTreeIndex,
+          draggedMinimumTreeIndex: more.treeIndex,
           dragging: true,
         }
       }

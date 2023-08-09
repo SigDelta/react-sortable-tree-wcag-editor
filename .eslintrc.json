@@ -126,6 +126,12 @@
       {
         "ignoreDeclarationSort": true
       }
+    ],
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
     ]
   },
   "settings": {

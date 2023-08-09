@@ -92,6 +92,17 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     getNodeKey,
     ...otherProps
   } = props
+
+  const isOneofParentNodes = (assumedParentPath, assumedChildPath) => {
+    return assumedParentPath.every(
+      (pathCrumb, index) => pathCrumb === assumedChildPath[index]
+    )
+  }
+
+  const isAnyParentSelected = selectedNodes.some((selectedNode) =>
+    isOneofParentNodes(selectedNode.path, path)
+  )
+
   const nodeTitle = title || node.title
   const nodeSubtitle = subtitle || node.subtitle
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
@@ -134,20 +145,21 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth, left: 0 }
   }
 
+  const handleSelectNode = () => {
+    if (isAnyParentSelected && !isSelected) {} else {
+      updateSelectedNodes((prevNodesList) => {
+        return isSelected
+          ? prevNodesList.filter(
+              (selectedNode) =>
+                !(getNodeKey({ node: selectedNode }) === nodeKey)
+            )
+          : [...prevNodesList, { ...node, path }]
+      })
+    }
+  }
+
   return (
-    <div
-      style={{ height: '100%' }}
-      {...otherProps}
-      onClick={() => {
-        updateSelectedNodes((prevNodesList) => {
-          return isSelected
-            ? prevNodesList.filter(
-                (selectedNode) =>
-                  !(getNodeKey({ node: selectedNode }) === nodeKey)
-              )
-            : [...prevNodesList, { ...node, path }]
-        })
-      }}>
+    <div style={{ height: '100%' }} {...otherProps} onClick={handleSelectNode}>
       {toggleChildrenVisibility &&
         node.children &&
         (node.children.length > 0 || typeof node.children === 'function') && (
@@ -204,7 +216,9 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               className={classnames(
                 'rst__rowContents',
                 canDrag ? '' : 'rst__rowContentsDragDisabled',
-                isSelected ? 'rst__rowContentsSelected' : '',
+                isSelected || isAnyParentSelected
+                  ? 'rst__rowContentsSelected'
+                  : '',
                 rowDirectionClass ?? ''
               )}>
               <div
