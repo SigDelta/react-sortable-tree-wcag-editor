@@ -146,14 +146,20 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   }
 
   const handleSelectNode = () => {
-    if (isAnyParentSelected && !isSelected) {} else {
+    if (isAnyParentSelected && !isSelected) {
+    } else {
       updateSelectedNodes((prevNodesList) => {
         return isSelected
           ? prevNodesList.filter(
               (selectedNode) =>
                 !(getNodeKey({ node: selectedNode }) === nodeKey)
             )
-          : [...prevNodesList, { ...node, path }]
+          : [
+              ...prevNodesList.filter(
+                (prevNode) => !isOneofParentNodes(path, prevNode.path)
+              ),
+              { ...node, path },
+            ]
       })
     }
   }
