@@ -1,7 +1,6 @@
 import React from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
 import { classnames } from './utils/classnames'
-import { isDescendant } from './utils/tree-data-utils'
 import './node-renderer-default.css'
 import { NodeData, TreeItem } from '.'
 
@@ -90,6 +89,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     updateSelectedNodes,
     selectedNodes,
     getNodeKey,
+    isDraggedDescendant,
     ...otherProps
   } = props
 
@@ -137,7 +137,6 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
       )
   }
 
-  const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node)
   const isLandingPadActive = !didDrop && isDragging
 
   let buttonStyle = { left: -0.5 * scaffoldBlockPxWidth, right: 0 }
@@ -146,8 +145,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   }
 
   const handleSelectNode = () => {
-    if (isAnyParentSelected && !isSelected) {
-    } else {
+    if (isAnyParentSelected && !isSelected) {} else {
       updateSelectedNodes((prevNodesList) => {
         return isSelected
           ? prevNodesList.filter(
@@ -162,6 +160,10 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
             ]
       })
     }
+  }
+
+  if (isDraggedDescendant && selectedNodes.length > 0) {
+    return <div>test</div>
   }
 
   return (

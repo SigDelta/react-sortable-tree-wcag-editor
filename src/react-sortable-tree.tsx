@@ -32,6 +32,7 @@ import {
   find,
   getNodeAtPath,
   insertNode,
+  isDescendant,
   removeNode,
   toggleExpandedForAll,
   walk,
@@ -645,6 +646,8 @@ class ReactSortableTree extends Component {
     const nodeProps = generateNodeProps ? generateNodeProps(callbackParams) : {}
     const rowCanDrag =
       typeof canDrag === 'function' ? canDrag(callbackParams) : canDrag
+    const isDraggedDescendant =
+      this.state.draggedNode && isDescendant(this.state.draggedNode, node)
 
     const sharedProps = {
       treeIndex,
@@ -653,6 +656,8 @@ class ReactSortableTree extends Component {
       path,
       treeId: this.treeId,
       rowDirection,
+      isDraggedDescendant,
+      selectedNodes: this.state.selectedNodes,
     }
 
     return (

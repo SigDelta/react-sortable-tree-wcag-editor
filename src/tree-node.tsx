@@ -71,9 +71,19 @@ class TreeNodeComponent extends Component<TreeRendererProps> {
       node: _node, // Delete from otherProps
       path: _path, // Delete from otherProps
       rowDirection,
+      selectedNodes,
+      isDraggedDescendant,
       ...otherProps
     } = props
 
+    const multipleDraggingNodeDescendant =
+      selectedNodes.length > 0 && isDraggedDescendant
+
+    if (multipleDraggingNodeDescendant) {
+      return null // TODO this causes virtuoso error - fix
+    }
+
+    console.log(isDraggedDescendant)
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
 
     // Construct the scaffold representing the structure of the tree
@@ -190,6 +200,7 @@ class TreeNodeComponent extends Component<TreeRendererProps> {
     if (typeof rowHeight === 'function') {
       calculatedRowHeight = rowHeight(treeIndex, _node, _path)
     }
+
     return connectDropTarget(
       <div
         {...otherProps}
