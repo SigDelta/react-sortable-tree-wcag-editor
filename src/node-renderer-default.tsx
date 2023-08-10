@@ -219,56 +219,61 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               ...style,
             }}>
             {handle}
-
-            <div
-              className={classnames(
-                'rst__rowContents',
-                canDrag ? '' : 'rst__rowContentsDragDisabled',
-                isSelected || isAnyParentSelected
-                  ? 'rst__rowContentsSelected'
-                  : '',
-                rowDirectionClass ?? ''
-              )}>
+            {draggedNode &&
+            draggedNode.id === node.id &&
+            selectedNodes.length > 1 ? (
+              <div>Multiple nodes are being dragged...</div>
+            ) : (
               <div
                 className={classnames(
-                  'rst__rowLabel',
+                  'rst__rowContents',
+                  canDrag ? '' : 'rst__rowContentsDragDisabled',
+                  isSelected || isAnyParentSelected
+                    ? 'rst__rowContentsSelected'
+                    : '',
                   rowDirectionClass ?? ''
                 )}>
-                <span
+                <div
                   className={classnames(
-                    'rst__rowTitle',
-                    node.subtitle ? 'rst__rowTitleWithSubtitle' : ''
+                    'rst__rowLabel',
+                    rowDirectionClass ?? ''
                   )}>
-                  {typeof nodeTitle === 'function'
-                    ? nodeTitle({
-                        node,
-                        path,
-                        treeIndex,
-                      })
-                    : nodeTitle}
-                </span>
-
-                {nodeSubtitle && (
-                  <span className="rst__rowSubtitle">
-                    {typeof nodeSubtitle === 'function'
-                      ? nodeSubtitle({
+                  <span
+                    className={classnames(
+                      'rst__rowTitle',
+                      node.subtitle ? 'rst__rowTitleWithSubtitle' : ''
+                    )}>
+                    {typeof nodeTitle === 'function'
+                      ? nodeTitle({
                           node,
                           path,
                           treeIndex,
                         })
-                      : nodeSubtitle}
+                      : nodeTitle}
                   </span>
-                )}
-              </div>
 
-              <div className="rst__rowToolbar">
-                {buttons?.map((btn, index) => (
-                  <div key={index} className="rst__toolbarButton">
-                    {btn}
-                  </div>
-                ))}
+                  {nodeSubtitle && (
+                    <span className="rst__rowSubtitle">
+                      {typeof nodeSubtitle === 'function'
+                        ? nodeSubtitle({
+                            node,
+                            path,
+                            treeIndex,
+                          })
+                        : nodeSubtitle}
+                    </span>
+                  )}
+                </div>
+
+                <div className="rst__rowToolbar">
+                  {buttons?.map((btn, index) => (
+                    <div key={index} className="rst__toolbarButton">
+                      {btn}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
