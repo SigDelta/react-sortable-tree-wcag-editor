@@ -367,8 +367,10 @@ class ReactSortableTree extends Component {
   }
 
   handleUpdateSelectedNodes(inputFn) {
-    const selectedNodes = inputFn(this.state.selectedNodes)
-    this.setState((prevState) => ({ ...prevState, selectedNodes }))
+    this.setState((prevState) => {
+      const selectedNodes = inputFn(prevState.selectedNodes)
+      return { ...prevState, selectedNodes }
+    })
   }
 
   getRows(treeData) {
@@ -381,7 +383,7 @@ class ReactSortableTree extends Component {
 
   startDrag = ({ path, node, ...more }) => {
     this.setState((prevState) => {
-      const multipleNodes = prevState.selectedNodes.length > 0
+      const multipleNodes = prevState.selectedNodes.length > 1
 
       const removeNodeAtPath = (treeData, nodePath) => {
         return removeNode({
@@ -450,7 +452,7 @@ class ReactSortableTree extends Component {
       const newDraggingTreeData = draggingTreeData || instanceProps.treeData
 
       const draggedNodes =
-        selectedNodes.length > 0
+        selectedNodes.length > 1
           ? selectedNodes.map((selectedNode) => {
               return getNodeAtPath({
                 treeData: instanceProps.treeData,

@@ -145,7 +145,9 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   }
 
   const handleSelectNode = () => {
-    if (isAnyParentSelected && !isSelected) {} else {
+    if (isAnyParentSelected && !isSelected) {
+      // TODO invert the condition?
+    } else {
       updateSelectedNodes((prevNodesList) => {
         return isSelected
           ? prevNodesList.filter(
@@ -162,9 +164,58 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     }
   }
 
-  if (isDraggedDescendant && selectedNodes.length > 0) {
-    return <div>test</div>
-  }
+  const areMultipleNodesBeingDragged =
+    draggedNode && draggedNode.id === node.id && selectedNodes.length > 1
+
+  const multipleDraggedNodesPreview = (
+    <div>Multiple nodes are being dragged...</div>
+  )
+
+  const draggedNodePreview = (
+    <div
+      className={classnames(
+        'rst__rowContents',
+        canDrag ? '' : 'rst__rowContentsDragDisabled',
+        isSelected || isAnyParentSelected ? 'rst__rowContentsSelected' : '',
+        rowDirectionClass ?? ''
+      )}>
+      <div className={classnames('rst__rowLabel', rowDirectionClass ?? '')}>
+        <span
+          className={classnames(
+            'rst__rowTitle',
+            node.subtitle ? 'rst__rowTitleWithSubtitle' : ''
+          )}>
+          {typeof nodeTitle === 'function'
+            ? nodeTitle({
+                node,
+                path,
+                treeIndex,
+              })
+            : nodeTitle}
+        </span>
+
+        {nodeSubtitle && (
+          <span className="rst__rowSubtitle">
+            {typeof nodeSubtitle === 'function'
+              ? nodeSubtitle({
+                  node,
+                  path,
+                  treeIndex,
+                })
+              : nodeSubtitle}
+          </span>
+        )}
+      </div>
+
+      <div className="rst__rowToolbar">
+        {buttons?.map((btn, index) => (
+          <div key={index} className="rst__toolbarButton">
+            {btn}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <div style={{ height: '100%' }} {...otherProps} onClick={handleSelectNode}>
@@ -219,61 +270,9 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               ...style,
             }}>
             {handle}
-            {draggedNode &&
-            draggedNode.id === node.id &&
-            selectedNodes.length > 1 ? (
-              <div>Multiple nodes are being dragged...</div>
-            ) : (
-              <div
-                className={classnames(
-                  'rst__rowContents',
-                  canDrag ? '' : 'rst__rowContentsDragDisabled',
-                  isSelected || isAnyParentSelected
-                    ? 'rst__rowContentsSelected'
-                    : '',
-                  rowDirectionClass ?? ''
-                )}>
-                <div
-                  className={classnames(
-                    'rst__rowLabel',
-                    rowDirectionClass ?? ''
-                  )}>
-                  <span
-                    className={classnames(
-                      'rst__rowTitle',
-                      node.subtitle ? 'rst__rowTitleWithSubtitle' : ''
-                    )}>
-                    {typeof nodeTitle === 'function'
-                      ? nodeTitle({
-                          node,
-                          path,
-                          treeIndex,
-                        })
-                      : nodeTitle}
-                  </span>
-
-                  {nodeSubtitle && (
-                    <span className="rst__rowSubtitle">
-                      {typeof nodeSubtitle === 'function'
-                        ? nodeSubtitle({
-                            node,
-                            path,
-                            treeIndex,
-                          })
-                        : nodeSubtitle}
-                    </span>
-                  )}
-                </div>
-
-                <div className="rst__rowToolbar">
-                  {buttons?.map((btn, index) => (
-                    <div key={index} className="rst__toolbarButton">
-                      {btn}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {areMultipleNodesBeingDragged
+              ? multipleDraggedNodesPreview
+              : draggedNodePreview}
           </div>
         )}
       </div>

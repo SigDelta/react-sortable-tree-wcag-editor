@@ -77,7 +77,7 @@ class TreeNodeComponent extends Component<TreeRendererProps> {
     } = props
 
     const multipleDraggingNodeDescendant =
-      selectedNodes.length > 0 && isDraggedDescendant
+      selectedNodes.length > 1 && isDraggedDescendant
 
     if (multipleDraggingNodeDescendant) {
       return null // TODO this causes virtuoso error - fix
