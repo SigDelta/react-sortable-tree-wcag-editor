@@ -485,11 +485,11 @@ class ReactSortableTree extends Component {
           newNode: ({ node }) => ({ ...node, expanded: true }),
           getNodeKey: this.props.getNodeKey,
         }),
+        draggedNodes: draggedNodes || [],
         // reset the scroll focus so it doesn't jump back
         // to a search result while dragging
         searchFocusTreeIndex: undefined,
         dragging: true,
-        draggedNodes: draggedNodes || [],
       }
     })
   }
@@ -599,6 +599,21 @@ class ReactSortableTree extends Component {
       getNodeKey: this.props.getNodeKey,
       draggedNodes: this.state.draggedNodes,
     })
+
+    if (this.state.draggedNodes.length > 1) {
+      this.setState((prevState) => {
+        const parentPath = path.slice(0, -1)
+
+        const newNodes = prevState.selectedNodes.map((node) => {
+          return {
+            ...node,
+            path: [...parentPath, node.id], // TODO change to getNodeKey function
+          }
+        })
+        return { selectedNodes: newNodes }
+      })
+      console.log(this.state.draggedNodes)
+    }
 
     this.props.onChange(treeData)
 
