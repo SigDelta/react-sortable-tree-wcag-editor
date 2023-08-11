@@ -83,7 +83,6 @@ class TreeNodeComponent extends Component<TreeRendererProps> {
       return null // TODO this causes virtuoso error - fix
     }
 
-    console.log(isDraggedDescendant)
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
 
     // Construct the scaffold representing the structure of the tree

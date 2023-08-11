@@ -810,10 +810,10 @@ export const insertNode = ({
   expandParent?: boolean | undefined
   getNodeKey: GetNodeKeyFunction
 }): FullTree & TreeIndex & TreePath & { parentNode: TreeItem | null } => {
-  let multipleNodesTree = [...treeData]
-  let multipleNodesInsertResult
-
   if (draggedNodes && draggedNodes.length > 0) {
+    let multipleNodesTree = [...treeData]
+    let multipleNodesInsertResult
+
     for (const draggedNodeInfo of draggedNodes) {
       const insertResult = addNodeAtDepthAndIndex({
         targetDepth,
