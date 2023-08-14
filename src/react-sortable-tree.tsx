@@ -603,7 +603,7 @@ class ReactSortableTree extends Component {
       draggedNodes: this.state.draggedNodes,
     })
 
-    if (this.state.draggedNodes.length > 1) {
+    if (this.state.selectedNodes.length > 0) {
       this.setState((prevState) => {
         const parentPath = path.slice(0, -1)
 

@@ -107,11 +107,9 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   const nodeSubtitle = subtitle || node.subtitle
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
   const nodeKey = getNodeKey({ node })
-  const parentKey = _parentNode ? getNodeKey({ node: _parentNode }) : null
-  const isSelected = selectedNodes.some((selectedNode) => {
-    const selectedNodeKey = getNodeKey({ node: selectedNode })
-    return selectedNodeKey === nodeKey || selectedNodeKey === parentKey
-  })
+  const isSelected = selectedNodes.some(
+    (selectedNode) => getNodeKey({ node: selectedNode }) === nodeKey
+  )
 
   let handle
   if (canDrag) {
