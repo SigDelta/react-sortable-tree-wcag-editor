@@ -381,29 +381,55 @@ class ReactSortableTree extends Component {
     })
   }
 
+  removeNodeAtPath = (treeData, nodePath) => {
+    return removeNode({
+      treeData,
+      path: nodePath,
+      getNodeKey: this.props.getNodeKey,
+    })
+  }
+
   startDrag = ({ path, node, ...more }) => {
     this.setState((prevState) => {
+      const { getNodeKey } = this.props
+      const nodeKey = getNodeKey({ node })
       const multipleNodes = prevState.selectedNodes.length > 1
+      const isOneOfSelectedNodes = prevState.selectedNodes.some(
+        (selectedNode) => getNodeKey({ node: selectedNode }) === nodeKey
+      )
 
-      const removeNodeAtPath = (treeData, nodePath) => {
-        return removeNode({
-          treeData,
-          path: nodePath,
-          getNodeKey: this.props.getNodeKey,
-        })
+      const isOneofParentNodes = (assumedParentPath, assumedChildPath) => {
+        // TODO move this function to utils
+        return assumedParentPath.every(
+          (pathCrumb, index) => pathCrumb === assumedChildPath[index]
+        )
       }
 
-      if (multipleNodes) {
-        let draggingTreeData = prevState.instanceProps.treeData
+      const isAnyParentSelected = prevState.selectedNodes.some((selectedNode) =>
+        isOneofParentNodes(selectedNode.path, path)
+      )
 
-        const draggedNode =
-          prevState.selectedNodes.find(
-            (selectedNode) => selectedNode.id === node.id
-          ) || prevState.selectedNodes[0]
-        const draggedDepth = draggedNode.path.length - 1
+      if (multipleNodes && (isOneOfSelectedNodes || isAnyParentSelected)) {
+        let draggingTreeData = prevState.instanceProps.treeData
+        const draggedNode = { ...node, path }
+        const draggedDepth = path.length - 1
+
+        const {
+          treeData: removedDraggedNodeTreeData,
+          treeIndex: draggedMinimumTreeIndex,
+        } = this.removeNodeAtPath(draggingTreeData, draggedNode.path)
+
+        draggingTreeData = removedDraggedNodeTreeData
 
         for (const selectedNode of prevState.selectedNodes) {
-          const { treeData } = removeNodeAtPath(
+          if (
+            getNodeKey({ node: selectedNode }) ===
+            getNodeKey({ node: draggedNode })
+          ) {
+            continue
+          }
+
+          const { treeData } = this.removeNodeAtPath(
             draggingTreeData,
             selectedNode.path
           )
@@ -415,7 +441,7 @@ class ReactSortableTree extends Component {
           draggingTreeData,
           draggedNode,
           draggedDepth,
-          draggedMinimumTreeIndex: more.treeIndex,
+          draggedMinimumTreeIndex,
           dragging: true,
         }
       }
@@ -424,7 +450,7 @@ class ReactSortableTree extends Component {
         treeData: draggingTreeData,
         node: draggedNode,
         treeIndex: draggedMinimumTreeIndex,
-      } = removeNodeAtPath(prevState.instanceProps.treeData, path)
+      } = this.removeNodeAtPath(prevState.instanceProps.treeData, path)
 
       return {
         draggingTreeData,
@@ -432,6 +458,7 @@ class ReactSortableTree extends Component {
         draggedDepth: path.length - 1,
         draggedMinimumTreeIndex,
         dragging: true,
+        selectedNodes: isOneOfSelectedNodes ? prevState.selectedNodes : [],
       }
     })
   }
@@ -610,7 +637,7 @@ class ReactSortableTree extends Component {
         const newNodes = prevState.selectedNodes.map((node) => {
           return {
             ...node,
-            path: [...parentPath, node.id], // TODO change to getNodeKey function
+            path: [...parentPath, this.props.getNodeKey({ node })],
           }
         })
         return { selectedNodes: newNodes }
@@ -724,14 +751,16 @@ class ReactSortableTree extends Component {
       draggedDepth,
       draggedMinimumTreeIndex,
       instanceProps,
+      draggingTreeData,
     } = this.state
 
-    const treeData = this.state.draggingTreeData || instanceProps.treeData
+    const treeData = draggingTreeData || instanceProps.treeData
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
 
     let rows
     let swapFrom
     let swapLength
+
     if (draggedNode && draggedMinimumTreeIndex !== undefined) {
       const addedResult = memoizedInsertNode({
         treeData,

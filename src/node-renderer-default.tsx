@@ -163,7 +163,9 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   }
 
   const areMultipleNodesBeingDragged =
-    draggedNode && draggedNode.id === node.id && selectedNodes.length > 1
+    draggedNode &&
+    getNodeKey({ node: draggedNode }) === nodeKey &&
+    selectedNodes.length > 1
 
   const multipleDraggedNodesPreview = (
     <div>Multiple nodes are being dragged...</div>
