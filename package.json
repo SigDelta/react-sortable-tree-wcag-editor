@@ -1,5 +1,5 @@
 {
-  "name": "@nosferatu500/react-sortable-tree",
+  "name": "react-sortable-tree-test",
   "version": "4.4.0",
   "description": "Drag-and-drop sortable component for nested data and hierarchies",
   "homepage": "https://nosferatu500.github.io/react-sortable-tree",
