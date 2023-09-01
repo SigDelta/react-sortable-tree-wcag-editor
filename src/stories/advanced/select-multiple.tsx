@@ -25,6 +25,7 @@ const SelectMultipleNodes: React.FC = () => {
         onDragStateChanged={(params) => {
 
         }}
+        onSelectionChange={(changeInfo) => console.log("Selection changed:", changeInfo)}
         getNodeKey={getNodeKey}
       />
     </div>

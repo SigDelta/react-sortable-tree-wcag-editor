@@ -7,6 +7,7 @@
   "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
   "scripts": {
+    "start": "yarn run storybook",
     "clean": "rimraf lib",
     "prebuild": "yarn clean",
     "build": "rollup -c",

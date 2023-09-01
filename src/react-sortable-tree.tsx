@@ -368,8 +368,16 @@ class ReactSortableTree extends Component {
 
   handleUpdateSelectedNodes(inputFn) {
     this.setState((prevState) => {
-      const selectedNodes = inputFn(prevState.selectedNodes)
-      return { ...prevState, selectedNodes }
+      const selectedNodesInfo = inputFn(prevState.selectedNodes)
+
+      if (this.props.onSelectionChange) {
+        this.props.onSelectionChange(selectedNodesInfo)
+      }
+
+      return {
+        ...prevState,
+        selectedNodes: selectedNodesInfo.selectedNodesList,
+      }
     })
   }
 
@@ -1039,6 +1047,7 @@ export type ReactSortableTreeProps = {
   debugMode?: boolean
 
   overscan?: number | { main: number; reverse: number }
+  onSelectionChange?: (changeInfo: Record<string, any>) => void
 }
 
 ReactSortableTree.defaultProps = {
@@ -1070,6 +1079,7 @@ ReactSortableTree.defaultProps = {
   rowDirection: 'ltr',
   debugMode: false,
   overscan: 0,
+  onSelectionChange: undefined,
 }
 
 const SortableTreeWithoutDndContext = function (props: ReactSortableTreeProps) {

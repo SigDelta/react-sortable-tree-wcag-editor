@@ -147,7 +147,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
       // TODO invert the condition?
     } else {
       updateSelectedNodes((prevNodesList) => {
-        return isSelected
+        const updatedNodesList = isSelected
           ? prevNodesList.filter(
               (selectedNode) =>
                 !(getNodeKey({ node: selectedNode }) === nodeKey)
@@ -158,6 +158,12 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               ),
               { ...node, path },
             ]
+
+        return {
+          selectedNodesList: updatedNodesList,
+          isNodeSelected: !isSelected,
+          node,
+        }
       })
     }
   }
