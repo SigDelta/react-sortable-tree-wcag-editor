@@ -280,6 +280,8 @@ class ReactSortableTree extends Component {
     )
     this.setState(stateUpdate)
 
+    this.props.setSelectedNodes(this.handleUpdateSelectedNodes)
+
     // Hook into react-dnd state changes to detect when the drag ends
     // TODO: This is very brittle, so it needs to be replaced if react-dnd
     // offers a more official way to detect when a drag ends
