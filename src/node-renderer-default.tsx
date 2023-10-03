@@ -93,14 +93,16 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     ...otherProps
   } = props
 
-  const isOneofParentNodes = (assumedParentPath, assumedChildPath) => {
-    return assumedParentPath.every(
-      (pathCrumb, index) => pathCrumb === assumedChildPath[index]
+  const isOneofParentNodes = (assumedParentNode: TreeItem) => {
+    const pathElements = path.slice(0, -1)
+
+    return pathElements.some(
+      (pathCrumb) => pathCrumb === getNodeKey({ node: assumedParentNode })
     )
   }
 
   const isAnyParentSelected = selectedNodes.some((selectedNode) =>
-    isOneofParentNodes(selectedNode.path, path)
+    isOneofParentNodes(selectedNode)
   )
 
   const nodeTitle = title || node.title
@@ -154,7 +156,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
             )
           : [
               ...prevNodesList.filter(
-                (prevNode) => !isOneofParentNodes(path, prevNode.path)
+                (prevNode) => !isOneofParentNodes(prevNode)
               ),
               { ...node, path },
             ]

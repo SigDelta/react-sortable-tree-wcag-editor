@@ -410,16 +410,19 @@ class ReactSortableTree extends Component {
         (selectedNode) => getNodeKey({ node: selectedNode }) === nodeKey
       )
 
-      const isOneofParentNodes = (assumedParentPath, assumedChildPath) => {
-        // TODO move this function to utils
-        return assumedParentPath.every(
-          (pathCrumb, index) => pathCrumb === assumedChildPath[index]
+      const isOneofParentNodes = (assumedParentNode: TreeItem) => {
+        const pathElements = path.slice(0, -1)
+
+        return pathElements.some(
+          (pathCrumb) => pathCrumb === getNodeKey({ node: assumedParentNode })
         )
       }
 
       const isAnyParentSelected = prevState.selectedNodes.some((selectedNode) =>
-        isOneofParentNodes(selectedNode.path, path)
+        isOneofParentNodes(selectedNode)
       )
+
+      const findNode = (config) => find(config).matches[0]
 
       if (multipleNodes && (isOneOfSelectedNodes || isAnyParentSelected)) {
         let draggingTreeData = prevState.instanceProps.treeData
@@ -438,6 +441,25 @@ class ReactSortableTree extends Component {
             getNodeKey({ node: selectedNode }) ===
             getNodeKey({ node: draggedNode })
           ) {
+            continue
+          }
+
+          if (!selectedNode.path) {
+            // TODO clean up
+            const foundNode = findNode({
+              getNodeKey,
+              treeData: draggingTreeData,
+              searchMethod: (data) =>
+                getNodeKey({ node: selectedNode }) === getNodeKey(data),
+            })
+
+            const { treeData } = this.removeNodeAtPath(
+              draggingTreeData,
+              foundNode.path
+            )
+
+            draggingTreeData = treeData
+
             continue
           }
 
@@ -493,16 +515,20 @@ class ReactSortableTree extends Component {
       //  an external element
       const newDraggingTreeData = draggingTreeData || instanceProps.treeData
 
-      const draggedNodes =
-        selectedNodes.length > 1
-          ? selectedNodes.map((selectedNode) => {
-              return getNodeAtPath({
-                treeData: instanceProps.treeData,
-                path: selectedNode.path,
-                getNodeKey: this.props.getNodeKey,
-              })
-            })
-          : undefined
+      const draggedNodes = selectedNodes.map((node) => ({ node }))
+
+      // const draggedNodes =
+      //   selectedNodes.length > 1
+      //     ? selectedNodes.map((selectedNode) => {
+      //         return getNodeAtPath({
+      //           treeData: instanceProps.treeData,
+      //           path: selectedNode.path,
+      //           getNodeKey: this.props.getNodeKey,
+      //         })
+      //       })
+      //     : undefined
+
+      // console.log(draggedNodes)
 
       const addedResult = memoizedInsertNode({
         treeData: newDraggingTreeData,

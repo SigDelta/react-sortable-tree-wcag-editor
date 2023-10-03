@@ -42,7 +42,7 @@ const data = [
   },
 ]
 
-const getNodeKey = ({ node: { id } }: any) => id
+const getNodeKey = ({ node: { id } }: any) => `test-${id}`
 
 function SelectMultipleNodes() {
   const [treeData, setTreeData] = useState(data)
