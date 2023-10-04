@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import SortableTree from '../..'
+import React, { useState } from 'react'
+import SortableTree, { TreeItem } from '../..'
 
 const data = [
   {
@@ -46,11 +46,7 @@ const getNodeKey = ({ node: { id } }: any) => `test-${id}`
 
 function SelectMultipleNodes() {
   const [treeData, setTreeData] = useState(data)
-  const updateInnerStateRef = useRef({ updateInnerState: () => {} })
-
-  const updateChildState = (updateInnerState) => {
-    updateInnerStateRef.current.updateInnerState = updateInnerState
-  }
+  const [selectedNodes, setSelectedNodes] = useState<TreeItem[]>([])
 
   return (
     <div style={{ height: 600, width: 700 }}>
@@ -59,29 +55,19 @@ function SelectMultipleNodes() {
         onChange={setTreeData}
         onDragStateChanged={(params) => {}}
         getNodeKey={getNodeKey}
-        setSelectedNodes={updateChildState}
+        setSelectedNodes={setSelectedNodes}
+        selectedNodes={selectedNodes}
       />
       <br />
       <br />
       <button
         type="button"
         onClick={() =>
-          updateInnerStateRef.current.updateInnerState((prevState) => ({
-            selectedNodesList: [
-              ...prevState,
-              { path: [getNodeKey({ node: data[0] })], ...data[0] },
-            ],
-          }))
+          setSelectedNodes((prevState) => [...prevState, { ...data[0] }])
         }>
         Add the chicken to selection
       </button>
-      <button
-        type="button"
-        onClick={() =>
-          updateInnerStateRef.current.updateInnerState(() => ({
-            selectedNodesList: [],
-          }))
-        }>
+      <button type="button" onClick={() => setSelectedNodes([])}>
         Clear selection
       </button>
     </div>

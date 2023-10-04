@@ -30,7 +30,6 @@ import {
 import {
   changeNodeAtPath,
   find,
-  getNodeAtPath,
   insertNode,
   isDescendant,
   removeNode,
@@ -234,7 +233,6 @@ class ReactSortableTree extends Component {
       searchMatches: [],
       searchFocusTreeIndex: undefined,
       dragging: false,
-      selectedNodes: [],
 
       // props that need to be used in gDSFP or static functions will be stored here
       instanceProps: {
@@ -279,10 +277,6 @@ class ReactSortableTree extends Component {
       false
     )
     this.setState(stateUpdate)
-
-    if (this.props.setSelectedNodes) {
-      this.props.setSelectedNodes(this.handleUpdateSelectedNodes)
-    }
 
     // Hook into react-dnd state changes to detect when the drag ends
     // TODO: This is very brittle, so it needs to be replaced if react-dnd
@@ -371,17 +365,14 @@ class ReactSortableTree extends Component {
   }
 
   handleUpdateSelectedNodes(inputFn) {
-    this.setState((prevState) => {
-      const selectedNodesInfo = inputFn(prevState.selectedNodes)
+    this.props.setSelectedNodes((prevSelectedNodes) => {
+      const selectedNodesInfo = inputFn(prevSelectedNodes)
 
       if (this.props.onSelectionChange) {
         this.props.onSelectionChange(selectedNodesInfo)
       }
 
-      return {
-        ...prevState,
-        selectedNodes: selectedNodesInfo.selectedNodesList,
-      }
+      return selectedNodesInfo.selectedNodesList
     })
   }
 
@@ -401,12 +392,12 @@ class ReactSortableTree extends Component {
     })
   }
 
-  startDrag = ({ path, node, ...more }) => {
+  startDrag = ({ path, node }) => {
     this.setState((prevState) => {
       const { getNodeKey } = this.props
       const nodeKey = getNodeKey({ node })
-      const multipleNodes = prevState.selectedNodes.length > 1
-      const isOneOfSelectedNodes = prevState.selectedNodes.some(
+      const multipleNodes = this.props.selectedNodes.length > 1
+      const isOneOfSelectedNodes = this.props.selectedNodes.some(
         (selectedNode) => getNodeKey({ node: selectedNode }) === nodeKey
       )
 
@@ -418,8 +409,8 @@ class ReactSortableTree extends Component {
         )
       }
 
-      const isAnyParentSelected = prevState.selectedNodes.some((selectedNode) =>
-        isOneofParentNodes(selectedNode)
+      const isAnyParentSelected = this.props.selectedNodes.some(
+        (selectedNode) => isOneofParentNodes(selectedNode)
       )
 
       const findNode = (config) => find(config).matches[0]
@@ -436,7 +427,7 @@ class ReactSortableTree extends Component {
 
         draggingTreeData = removedDraggedNodeTreeData
 
-        for (const selectedNode of prevState.selectedNodes) {
+        for (const selectedNode of this.props.selectedNodes) {
           if (
             getNodeKey({ node: selectedNode }) ===
             getNodeKey({ node: draggedNode })
@@ -492,7 +483,6 @@ class ReactSortableTree extends Component {
         draggedDepth: path.length - 1,
         draggedMinimumTreeIndex,
         dragging: true,
-        selectedNodes: isOneOfSelectedNodes ? prevState.selectedNodes : [],
       }
     })
   }
@@ -510,12 +500,12 @@ class ReactSortableTree extends Component {
       return
     }
 
-    this.setState(({ draggingTreeData, instanceProps, selectedNodes }) => {
+    this.setState(({ draggingTreeData, instanceProps }) => {
       // Fall back to the tree data if something is being dragged in from
       //  an external element
       const newDraggingTreeData = draggingTreeData || instanceProps.treeData
 
-      const draggedNodes = selectedNodes.map((node) => ({
+      const draggedNodes = this.props.selectedNodes.map((node) => ({
         node,
         path: node.path,
       }))
@@ -658,17 +648,22 @@ class ReactSortableTree extends Component {
       draggedNodes: this.state.draggedNodes,
     })
 
-    if (this.state.selectedNodes.length > 0) {
-      this.setState((prevState) => {
+    if (this.props.selectedNodes.length > 0) {
+      this.handleUpdateSelectedNodes((prevSelectedNodes) => {
         const parentPath = path.slice(0, -1)
+        const getNodePath = (nodeItem) => [
+          ...parentPath,
+          this.props.getNodeKey({ node: nodeItem }),
+        ]
 
-        const newNodes = prevState.selectedNodes.map((node) => {
+        const newNodes = prevSelectedNodes.map((prevNode) => {
           return {
-            ...node,
-            path: [...parentPath, this.props.getNodeKey({ node })],
+            ...prevNode,
+            path: getNodePath(prevNode),
           }
         })
-        return { selectedNodes: newNodes }
+
+        return { selectedNodesList: newNodes }
       })
     }
 
@@ -731,7 +726,7 @@ class ReactSortableTree extends Component {
       treeId: this.treeId,
       rowDirection,
       isDraggedDescendant,
-      selectedNodes: this.state.selectedNodes,
+      selectedNodes: this.props.selectedNodes,
     }
 
     return (
@@ -753,7 +748,7 @@ class ReactSortableTree extends Component {
           canDrag={rowCanDrag}
           toggleChildrenVisibility={this.toggleChildrenVisibility}
           updateSelectedNodes={this.handleUpdateSelectedNodes}
-          selectedNodes={this.state.selectedNodes}
+          selectedNodes={this.props.selectedNodes}
           getNodeKey={this.props.getNodeKey}
           {...sharedProps}
           {...nodeProps}
