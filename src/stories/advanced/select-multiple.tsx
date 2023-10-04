@@ -58,9 +58,6 @@ function SelectMultipleNodes() {
         treeData={treeData}
         onChange={setTreeData}
         onDragStateChanged={(params) => {}}
-        onSelectionChange={(changeInfo) =>
-          console.log('Selection changed:', changeInfo)
-        }
         getNodeKey={getNodeKey}
         setSelectedNodes={updateChildState}
       />

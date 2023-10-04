@@ -515,20 +515,10 @@ class ReactSortableTree extends Component {
       //  an external element
       const newDraggingTreeData = draggingTreeData || instanceProps.treeData
 
-      const draggedNodes = selectedNodes.map((node) => ({ node }))
-
-      // const draggedNodes =
-      //   selectedNodes.length > 1
-      //     ? selectedNodes.map((selectedNode) => {
-      //         return getNodeAtPath({
-      //           treeData: instanceProps.treeData,
-      //           path: selectedNode.path,
-      //           getNodeKey: this.props.getNodeKey,
-      //         })
-      //       })
-      //     : undefined
-
-      // console.log(draggedNodes)
+      const draggedNodes = selectedNodes.map((node) => ({
+        node,
+        path: node.path,
+      }))
 
       const addedResult = memoizedInsertNode({
         treeData: newDraggingTreeData,

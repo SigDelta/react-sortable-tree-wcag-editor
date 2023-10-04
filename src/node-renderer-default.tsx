@@ -2,7 +2,7 @@ import React from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
 import { classnames } from './utils/classnames'
 import './node-renderer-default.css'
-import { NodeData, TreeItem } from '.'
+import { NodeData, TreeItem, find } from '.'
 
 const defaultProps = {
   isSearchMatch: false,
@@ -93,16 +93,38 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     ...otherProps
   } = props
 
-  const isOneofParentNodes = (assumedParentNode: TreeItem) => {
-    const pathElements = path.slice(0, -1)
+  const isOneofParentNodes = (
+    assumedParentNode: TreeItem,
+    nodePath: ReturnType<typeof getNodeKey>[]
+  ) => {
+    const pathElements = nodePath.slice(0, -1)
 
     return pathElements.some(
       (pathCrumb) => pathCrumb === getNodeKey({ node: assumedParentNode })
     )
   }
 
+  const isOneofChildNodes = (
+    assumedChildNode: TreeItem,
+    testedNode: TreeItem
+  ): boolean => {
+    if (assumedChildNode.path) {
+      return isOneofParentNodes(testedNode, assumedChildNode.path)
+    }
+
+    return (
+      find({
+        treeData: [testedNode],
+        searchMethod(data) {
+          return getNodeKey(data) === getNodeKey({ node: assumedChildNode })
+        },
+        getNodeKey,
+      }).matches.length === 1
+    )
+  }
+
   const isAnyParentSelected = selectedNodes.some((selectedNode) =>
-    isOneofParentNodes(selectedNode)
+    isOneofParentNodes(selectedNode, path)
   )
 
   const nodeTitle = title || node.title
@@ -155,9 +177,13 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
                 !(getNodeKey({ node: selectedNode }) === nodeKey)
             )
           : [
-              ...prevNodesList.filter(
-                (prevNode) => !isOneofParentNodes(prevNode)
-              ),
+              ...prevNodesList.filter((prevNode) => {
+                const isAnyChildOrParentSelected =
+                  isOneofParentNodes(prevNode, path) ||
+                  isOneofChildNodes(prevNode, node)
+
+                return !isAnyChildOrParentSelected
+              }),
               { ...node, path },
             ]
 
