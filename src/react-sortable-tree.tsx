@@ -251,10 +251,7 @@ class ReactSortableTree extends Component {
       this.props.canDrop,
       this.drop,
       this.dragHover,
-      this.dndType,
-      this.state.draggingTreeData,
-      this.props.treeData,
-      this.props.getNodeKey
+      this.dndType
     )
 
     this.toggleChildrenVisibility = this.toggleChildrenVisibility.bind(this)
@@ -767,14 +764,15 @@ class ReactSortableTree extends Component {
       getNodeKey,
       rowDirection,
     } = mergeTheme(this.props)
+
     const {
       searchMatches,
       searchFocusTreeIndex,
       draggedNode,
       draggedDepth,
       draggedMinimumTreeIndex,
-      instanceProps,
       draggingTreeData,
+      instanceProps,
     } = this.state
 
     const treeData = draggingTreeData || instanceProps.treeData
@@ -815,7 +813,7 @@ class ReactSortableTree extends Component {
 
     // Seek to the focused search result if there is one specified
     if (searchFocusTreeIndex !== undefined) {
-      this.listRef.current.scrollToIndex({
+      this.listRef?.current?.scrollToIndex({
         index: searchFocusTreeIndex,
         align: 'center',
       })
@@ -950,7 +948,7 @@ export type ReactSortableTreeProps = {
 
   // Properties passed directly to the underlying Virtuoso component
   // See https://virtuoso.dev/virtuoso-api-reference/#virtuoso-properties
-  virtuosoProps?: VirtuosoProps
+  virtuosoProps?: VirtuosoProps<any, unknown>
 
   // Ref for Virtuoso component
   // Use virtuosoRef when you wont to use virtuoso handler
@@ -1097,7 +1095,9 @@ ReactSortableTree.defaultProps = {
   onSelectionChange: undefined,
 }
 
-const SortableTreeWithoutDndContext = function (props: ReactSortableTreeProps) {
+export const SortableTreeWithoutDndContext = (
+  props: ReactSortableTreeProps
+) => {
   return (
     <DndContext.Consumer>
       {({ dragDropManager }) =>
@@ -1109,17 +1109,10 @@ const SortableTreeWithoutDndContext = function (props: ReactSortableTreeProps) {
   )
 }
 
-const SortableTree = function (props: ReactSortableTreeProps) {
+export const SortableTree = (props: ReactSortableTreeProps) => {
   return (
     <DndProvider debugMode={props.debugMode} backend={HTML5Backend}>
       <SortableTreeWithoutDndContext {...props} />
     </DndProvider>
   )
 }
-
-// Export the tree component without the react-dnd DragDropContext,
-// for when component is used with other components using react-dnd.
-// see: https://github.com/gaearon/react-dnd/issues/186
-export { SortableTreeWithoutDndContext }
-
-export default SortableTree

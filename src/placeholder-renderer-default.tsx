@@ -14,20 +14,21 @@ const defaultProps = {
   canDrop: false,
 }
 
-const PlaceholderRendererDefault: React.FC<PlaceholderRendererProps> =
-  function (props) {
-    props = { ...defaultProps, ...props }
-    const { canDrop, isOver } = props
+const PlaceholderRendererDefault: React.FC<PlaceholderRendererProps> = (
+  props
+) => {
+  props = { ...defaultProps, ...props }
+  const { canDrop, isOver } = props
 
-    return (
-      <div
-        className={classnames(
-          'rst__placeholder',
-          canDrop ? 'rst__placeholderLandingPad' : '',
-          canDrop && !isOver ? 'rst__placeholderCancelPad' : ''
-        )}
-      />
-    )
-  }
+  return (
+    <div
+      className={classnames(
+        'rst__placeholder',
+        canDrop ? 'rst__placeholderLandingPad' : '',
+        canDrop && !isOver ? 'rst__placeholderCancelPad' : ''
+      )}
+    />
+  )
+}
 
 export default PlaceholderRendererDefault

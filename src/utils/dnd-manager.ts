@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import { DragSource as dragSource, DropTarget as dropTarget } from 'react-dnd'
-import { memoizedInsertNode } from './memoized-tree-data-utils'
 import { getDepth } from './tree-data-utils'
 
 let rafId = 0
@@ -131,7 +130,7 @@ const getTargetDepth = (
   )
 
   // If a maxDepth is defined, constrain the target depth
-  if (maxDepth !== undefined && maxDepth !== undefined) {
+  if (maxDepth !== undefined) {
     const draggedNode = monitor.getItem().node
     const draggedChildDepth = getDepth(draggedNode)
 
@@ -150,10 +149,7 @@ const canDrop = (
   canNodeHaveChildren,
   treeId,
   maxDepth,
-  treeRefcanDrop,
-  draggingTreeData,
-  treeReftreeData,
-  getNodeKey
+  treeRefcanDrop
 ) => {
   if (!monitor.isOver()) {
     return false
@@ -205,10 +201,7 @@ export const wrapTarget = (
   treeRefcanDrop,
   drop,
   dragHover,
-  dndType,
-  draggingTreeData,
-  treeReftreeData,
-  getNodeKey
+  dndType
 ) => {
   const nodeDropTarget = {
     drop: (dropTargetProps, monitor, component) => {
@@ -277,10 +270,7 @@ export const wrapTarget = (
         canNodeHaveChildren,
         treeId,
         maxDepth,
-        treeRefcanDrop,
-        draggingTreeData,
-        treeReftreeData,
-        getNodeKey
+        treeRefcanDrop
       ),
   }
 

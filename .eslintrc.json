@@ -3,7 +3,7 @@
     "browser": true,
     "shared-node-browser": true,
     "node": true,
-    "es2021": true
+    "es2022": true
   },
   "extends": [
     "airbnb",
@@ -34,7 +34,7 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2021,
+    "ecmaVersion": 2022,
     "sourceType": "module",
     "project": "./tsconfig.json",
     "parser": "@typescript-eslint/parser",
@@ -54,7 +54,15 @@
     // Too restrictive: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/destructuring-assignment.md
     "react/destructuring-assignment": "off",
     "react/require-default-props": "off",
+    "react/display-name": "off",
     "react/jsx-props-no-spreading": "off",
+    "react/function-component-definition": [
+      "warn",
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ],
     "react/no-unstable-nested-components": ["warn", { "allowAsProps": true }],
     // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
     "react/jsx-filename-extension": "off",
@@ -90,7 +98,6 @@
     "import/export": "error",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
-    "@typescript-eslint/no-duplicate-imports": ["error"],
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-empty-interface": "off",
