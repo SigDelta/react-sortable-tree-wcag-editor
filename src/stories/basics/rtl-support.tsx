@@ -16,10 +16,10 @@ const data = [
       { title: 'Egg' },
     ],
   },
-];
+]
 
 const RTLSupport: React.FC = () => {
-  const [treeData, setTreeData] = useState(data);
+  const [treeData, setTreeData] = useState(data)
 
   return (
     <div style={{ height: 300, width: 700 }}>
@@ -32,4 +32,4 @@ const RTLSupport: React.FC = () => {
   )
 }
 
-export default RTLSupport;
+export default RTLSupport

@@ -50,7 +50,10 @@ const YourExternalNodeComponent = DragSource(
 )(externalNodeBaseComponent)
 
 const ExternalNode: React.FC = () => {
-  const [treeData, setTreeData] = useState([{ title: 'Mama Rabbit' }, { title: 'Papa Rabbit' }]);
+  const [treeData, setTreeData] = useState([
+    { title: 'Mama Rabbit' },
+    { title: 'Papa Rabbit' },
+  ])
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -62,11 +65,10 @@ const ExternalNode: React.FC = () => {
             dndType={externalNodeType}
           />
         </div>
-        <YourExternalNodeComponent node={{ title: 'Baby Rabbit' }} />← drag
-        this
+        <YourExternalNodeComponent node={{ title: 'Baby Rabbit' }} />← drag this
       </div>
     </DndProvider>
   )
 }
 
-export default ExternalNode;
+export default ExternalNode

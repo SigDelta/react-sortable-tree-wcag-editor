@@ -10,12 +10,12 @@ const data = [
     expanded: true,
     children: [{ name: 'Branch Manager' }],
   },
-];
+]
 
 const ModifyNodes: React.FC = () => {
-  const [treeData, setTreeData] = useState<any>(data);
+  const [treeData, setTreeData] = useState<any>(data)
 
-  const getNodeKey = ({ treeIndex }: { treeIndex: number }) => treeIndex;
+  const getNodeKey = ({ treeIndex }: { treeIndex: number }) => treeIndex
 
   return (
     <div style={{ height: 300, width: 700 }}>
@@ -28,7 +28,7 @@ const ModifyNodes: React.FC = () => {
               style={{ fontSize: '1.1rem' }}
               value={node.name}
               onChange={(event) => {
-                const name = event.target.value;
+                const name = event.target.value
 
                 setTreeData(
                   changeNodeAtPath({
@@ -37,7 +37,7 @@ const ModifyNodes: React.FC = () => {
                     getNodeKey,
                     newNode: { ...node, name },
                   })
-                );
+                )
               }}
             />
           ),
@@ -47,4 +47,4 @@ const ModifyNodes: React.FC = () => {
   )
 }
 
-export default ModifyNodes;
+export default ModifyNodes

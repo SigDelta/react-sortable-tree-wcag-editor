@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
-import SortableTree, { getFlatDataFromTree, getTreeFromFlatData } from '../../../src'
+import SortableTree, {
+  getFlatDataFromTree,
+  getTreeFromFlatData,
+} from '../../../src'
 // In your own app, you would need to use import styles once in the app
 // import 'react-sortable-tree/styles.css';
 
@@ -11,12 +14,14 @@ const initialData = [
 ]
 
 const TreeDataIO: React.FC = () => {
-  const [treeData, setTreeData] = useState(getTreeFromFlatData({
-    flatData: initialData.map((node) => ({ ...node, title: node.name })),
-    getKey: (node) => node.id, // resolve a node's key
-    getParentKey: (node) => node.parent, // resolve a node's parent's key
-    rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
-  }));
+  const [treeData, setTreeData] = useState(
+    getTreeFromFlatData({
+      flatData: initialData.map((node) => ({ ...node, title: node.name })),
+      getKey: (node) => node.id, // resolve a node's key
+      getParentKey: (node) => node.parent, // resolve a node's parent's key
+      rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
+    })
+  )
 
   const flatData = getFlatDataFromTree({
     treeData,
@@ -35,10 +40,7 @@ const TreeDataIO: React.FC = () => {
     <div>
       ↓treeData for this tree was generated from flat data similar to DB rows↓
       <div style={{ height: 300, width: 700 }}>
-        <SortableTree
-          treeData={treeData}
-          onChange={setTreeData}
-        />
+        <SortableTree treeData={treeData} onChange={setTreeData} />
       </div>
       <hr />
       ↓This flat data is generated from the modified tree data↓
@@ -53,4 +55,4 @@ const TreeDataIO: React.FC = () => {
   )
 }
 
-export default TreeDataIO;
+export default TreeDataIO

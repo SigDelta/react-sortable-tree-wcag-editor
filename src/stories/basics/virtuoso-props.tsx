@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import SortableTree from '../../../src'
-import { VirtuosoHandle } from 'react-virtuoso';
+import { VirtuosoHandle } from 'react-virtuoso'
 // In your own app, you would need to use import styles once in the app
 // import 'react-sortable-tree/styles.css';
 
@@ -18,21 +18,21 @@ const data = [
       { title: 'Egg' },
     ],
   },
-];
+]
 
 const VirtuosoProps: React.FC = () => {
-  const [treeData, setTreeData] = useState(data);
+  const [treeData, setTreeData] = useState(data)
 
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [scrollTop, setScrollTop] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false)
+  const [scrollTop, setScrollTop] = useState(0)
 
   const virtuosoRef = React.createRef<VirtuosoHandle>()
 
   const isScrollingVirtuoso = (scrollingState: any) => {
     if (virtuosoRef?.current) {
-      virtuosoRef?.current.getState(virtuosoState => {
-        setIsScrolling(scrollingState);
-        setScrollTop(virtuosoState.scrollTop);
+      virtuosoRef?.current.getState((virtuosoState) => {
+        setIsScrolling(scrollingState)
+        setScrollTop(virtuosoState.scrollTop)
       })
     }
   }
@@ -48,10 +48,9 @@ const VirtuosoProps: React.FC = () => {
         />
       </div>
       <hr />
-        Current scrollTop:{' '}
-        {isScrolling ? '...' : scrollTop}
+      Current scrollTop: {isScrolling ? '...' : scrollTop}
     </div>
   )
 }
 
-export default VirtuosoProps;
+export default VirtuosoProps
