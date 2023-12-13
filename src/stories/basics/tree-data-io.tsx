@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
-import { SortableTree, getFlatDataFromTree, getTreeFromFlatData } from '../../../src'
+import {
+  SortableTree,
+  getFlatDataFromTree,
+  getTreeFromFlatData,
+} from '../../../src'
 // In your own app, you would need to use import styles once in the app
 // import 'react-sortable-tree/styles.css';
 

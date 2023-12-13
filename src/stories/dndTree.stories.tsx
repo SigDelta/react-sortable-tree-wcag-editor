@@ -1,16 +1,12 @@
 import React, { useState } from 'react'
-import {
-  ReactSortableTreeProps,
-  SortableTreeWithoutDndContext,
-} from '../react-sortable-tree'
+import { ReactSortableTreeProps, SortableTree } from '../react-sortable-tree'
 
 import { StoryFn } from '@storybook/react'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import { TreeItem } from '../utils/default-handlers'
 
 export default {
   title: 'StructureTree',
-  component: SortableTreeWithoutDndContext,
+  component: SortableTree,
   parameters: {
     layout: 'centered',
   },
@@ -55,16 +51,31 @@ const data = [
     children: [{ title: 'Meet 2', id: 16 }],
   },
 ]
+const getNodeKey = ({ node: { id } }: any) => `test-${id}`
 
 const Template: StoryFn<ReactSortableTreeProps> = (args) => {
   const [treeData, setTreeData] = useState(data)
+  const [selectedNodes, setSelectedNodes] = useState<TreeItem[]>([])
   return (
-    <DndProvider backend={HTML5Backend}>
-      <SortableTreeWithoutDndContext
-        treeData={treeData}
-        onChange={setTreeData}
-      />
-    </DndProvider>
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      <div style={{ height: 800, width: 400 }}>
+        <SortableTree
+          treeData={treeData}
+          onChange={setTreeData}
+          getNodeKey={getNodeKey}
+          setSelectedNodes={setSelectedNodes}
+          selectedNodes={selectedNodes}
+        />
+      </div>
+      <div style={{ height: 800, width: 200 }}>
+        <h3>Selected Elements:</h3>
+        <ul>
+          {selectedNodes.map((element, index) => (
+            <li key={index}>{element.id}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
   )
 }
 

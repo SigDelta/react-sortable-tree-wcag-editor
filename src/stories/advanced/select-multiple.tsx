@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import SortableTree, { TreeItem } from '../..'
+import { SortableTree, TreeItem } from '../../../src'
 
 const data = [
   {
