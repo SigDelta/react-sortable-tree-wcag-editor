@@ -47,9 +47,7 @@ const getNodeDataAtTreeIndexOrNextIndex = ({
   isPseudoRoot: boolean
 }) => {
   // The pseudo-root is not considered in the path
-  const selfPath = isPseudoRoot
-    ? []
-    : [...path, getNodeKey({ node, treeIndex: currentIndex })]
+  const selfPath = isPseudoRoot ? [] : [...path, getNodeKey(node.id)]
 
   // Return target node when found
   if (currentIndex === targetIndex) {
@@ -118,9 +116,7 @@ const walkDescendants = ({
   lowerSiblingCounts = [],
 }) => {
   // The pseudo-root is not considered in the path
-  const selfPath = isPseudoRoot
-    ? []
-    : [...path, getNodeKey({ node, treeIndex: currentIndex })]
+  const selfPath = isPseudoRoot ? [] : [...path, getNodeKey(node.id)]
   const selfInfo = isPseudoRoot
     ? undefined
     : {
@@ -188,9 +184,7 @@ const mapDescendants = ({
   const nextNode = { ...node }
 
   // The pseudo-root is not considered in the path
-  const selfPath = isPseudoRoot
-    ? []
-    : [...path, getNodeKey({ node: nextNode, treeIndex: currentIndex })]
+  const selfPath = isPseudoRoot ? [] : [...path, getNodeKey(nextNode.id)]
   const selfInfo = {
     node: nextNode,
     parentNode,
@@ -372,10 +366,7 @@ export const changeNodeAtPath = ({
     currentTreeIndex,
     pathIndex,
   }) => {
-    if (
-      !isPseudoRoot &&
-      getNodeKey({ node, treeIndex: currentTreeIndex }) !== path[pathIndex]
-    ) {
+    if (!isPseudoRoot && getNodeKey(node.id) !== path[pathIndex]) {
       return RESULT_MISS
     }
 
@@ -634,10 +625,7 @@ const addNodeAtDepthAndIndex = ({
   getNodeKey,
   path = [],
 }) => {
-  const selfPath = (n) =>
-    isPseudoRoot
-      ? []
-      : [...path, getNodeKey({ node: n, treeIndex: currentIndex })]
+  const selfPath = (n) => (isPseudoRoot ? [] : [...path, getNodeKey(n.id)])
 
   // If the current position is the only possible place to add, add it
   if (
@@ -836,10 +824,7 @@ export const insertNode = ({
     return {
       treeData: multipleNodesInsertResult.node.children,
       treeIndex,
-      path: [
-        ...multipleNodesInsertResult.parentPath,
-        getNodeKey({ node: newNode, treeIndex }),
-      ],
+      path: [...multipleNodesInsertResult.parentPath, getNodeKey(newNode.id)],
       parentNode: multipleNodesInsertResult.parentNode,
     }
   }
@@ -848,7 +833,7 @@ export const insertNode = ({
     return {
       treeData: [newNode],
       treeIndex: 0,
-      path: [getNodeKey({ node: newNode, treeIndex: 0 })],
+      path: [getNodeKey(newNode.id)],
       parentNode: undefined,
     }
   }
@@ -875,10 +860,7 @@ export const insertNode = ({
   return {
     treeData: insertResult.node.children,
     treeIndex,
-    path: [
-      ...insertResult.parentPath,
-      getNodeKey({ node: newNode, treeIndex }),
-    ],
+    path: [...insertResult.parentPath, getNodeKey(newNode.id)],
     parentNode: insertResult.parentNode,
   }
 }
@@ -1000,9 +982,7 @@ export const find = ({
     let isSelfMatch = false
     let hasFocusMatch = false
     // The pseudo-root is not considered in the path
-    const selfPath = isPseudoRoot
-      ? []
-      : [...path, getNodeKey({ node, treeIndex: currentIndex })]
+    const selfPath = isPseudoRoot ? [] : [...path, getNodeKey(node.id)]
     const extraInfo = isPseudoRoot
       ? undefined
       : {

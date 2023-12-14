@@ -2,7 +2,7 @@ import React from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
 import { classnames } from './utils/classnames'
 import './node-renderer-default.css'
-import { NodeData, TreeItem, find } from '.'
+import { NodeData, SelectedNode, TreeItem, TreeNodeId, find } from '.'
 
 const defaultProps = {
   isSearchMatch: false,
@@ -47,7 +47,7 @@ export interface NodeRendererProps {
   connectDragPreview: ConnectDragPreview
   connectDragSource: ConnectDragSource
   updateSelectedNodes: (
-    inputFn: (selectedNodes: TreeItem[]) => TreeItem[]
+    inputFn: (selectedNodes: TreeNodeId[]) => SelectedNode[]
   ) => void
   parentNode?: TreeItem | undefined
   startDrag: ({ path }: { path: number[] | number[][] }) => void
@@ -94,34 +94,34 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
   } = props
 
   const isOneofParentNodes = (
-    assumedParentNode: TreeItem,
+    assumedParentNodeId: TreeNodeId,
     nodePath: ReturnType<typeof getNodeKey>[]
   ) => {
     const pathElements = nodePath.slice(0, -1)
 
     return pathElements.some(
-      (pathCrumb) => pathCrumb === getNodeKey({ node: assumedParentNode })
+      (pathCrumb) => pathCrumb === getNodeKey(assumedParentNodeId)
     )
   }
 
-  const isOneofChildNodes = (
-    assumedChildNode: TreeItem,
-    testedNode: TreeItem
-  ): boolean => {
-    if (assumedChildNode.path) {
-      return isOneofParentNodes(testedNode, assumedChildNode.path)
-    }
+  // const isOneofChildNodes = (
+  //   assumedChildNode: TreeItem,
+  //   testedNode: TreeItem
+  // ): boolean => {
+  //   if (assumedChildNode.path) {
+  //     return isOneofParentNodes(testedNode, assumedChildNode.path)
+  //   }
 
-    return (
-      find({
-        treeData: [testedNode],
-        searchMethod(data) {
-          return getNodeKey(data) === getNodeKey({ node: assumedChildNode })
-        },
-        getNodeKey,
-      }).matches.length === 1
-    )
-  }
+  //   return (
+  //     find({
+  //       treeData: [testedNode],
+  //       searchMethod(data) {
+  //         return getNodeKey(data) === getNodeKey({ node: assumedChildNode })
+  //       },
+  //       getNodeKey,
+  //     }).matches.length === 1
+  //   )
+  // }
 
   const isAnyParentSelected = selectedNodes.some((selectedNode) =>
     isOneofParentNodes(selectedNode, path)
@@ -130,9 +130,9 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
   const nodeTitle = title || node.title
   const nodeSubtitle = subtitle || node.subtitle
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
-  const nodeKey = getNodeKey({ node })
+  const nodeKey = getNodeKey(node.id)
   const isSelected = selectedNodes.some(
-    (selectedNode) => getNodeKey({ node: selectedNode }) === nodeKey
+    (selectedNodeId) => getNodeKey(selectedNodeId) === nodeKey
   )
 
   let handle
@@ -173,18 +173,13 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
       updateSelectedNodes((prevNodesList) => {
         const updatedNodesList = isSelected
           ? prevNodesList.filter(
-              (selectedNode) =>
-                !(getNodeKey({ node: selectedNode }) === nodeKey)
+              (selectedNodeId) => !(getNodeKey(selectedNodeId) === nodeKey)
             )
           : [
-              ...prevNodesList.filter((prevNode) => {
-                const isAnyChildOrParentSelected =
-                  isOneofParentNodes(prevNode, path) ||
-                  isOneofChildNodes(prevNode, node)
-
-                return !isAnyChildOrParentSelected
-              }),
-              { ...node, path },
+              ...prevNodesList.filter((prevNodeId) =>
+                isOneofParentNodes(prevNodeId, path)
+              ),
+              node.id,
             ]
 
         return {

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { ReactSortableTreeProps, SortableTree } from '../react-sortable-tree'
 
 import { StoryFn } from '@storybook/react'
-import { TreeItem } from '../utils/default-handlers'
+import { TreeItem, TreeNodeId } from '../utils/default-handlers'
 
 export default {
   title: 'StructureTree',
@@ -51,14 +51,25 @@ const data = [
     children: [{ title: 'Meet 2', id: 16 }],
   },
 ]
-const getNodeKey = ({ node: { id } }: any) => `test-${id}`
+const getNodeKey = (nodeId: TreeNodeId) => `test-${nodeId}`
 
 const Template: StoryFn<ReactSortableTreeProps> = (args) => {
   const [treeData, setTreeData] = useState(data)
-  const [selectedNodes, setSelectedNodes] = useState<TreeItem[]>([])
+  const [selectedNodes, setSelectedNodes] = useState<TreeNodeId[]>([])
   return (
     <div style={{ display: 'flex', gap: '1rem' }}>
       <div style={{ height: 800, width: 400 }}>
+        <button
+          onClick={() =>
+            setSelectedNodes((prevNodes) => {
+              if (!prevNodes.includes(1)) {
+                return [...prevNodes, 1]
+              }
+              return prevNodes
+            })
+          }>
+          Add tag id 1
+        </button>
         <SortableTree
           treeData={treeData}
           onChange={setTreeData}
@@ -70,8 +81,8 @@ const Template: StoryFn<ReactSortableTreeProps> = (args) => {
       <div style={{ height: 800, width: 200 }}>
         <h3>Selected Elements:</h3>
         <ul>
-          {selectedNodes.map((element, index) => (
-            <li key={index}>{element.id}</li>
+          {selectedNodes.map((elementId, index) => (
+            <li key={index}>{elementId}</li>
           ))}
         </ul>
       </div>

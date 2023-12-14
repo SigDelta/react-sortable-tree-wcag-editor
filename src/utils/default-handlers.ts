@@ -12,12 +12,21 @@ export type GetTreeItemChildrenFn = (data: GetTreeItemChildren) => void
 
 export type GetNodeKeyFunction = (data: TreeIndex & TreeNode) => string | number
 
+export type TreeNodeId = number | string
+
 export interface TreeItem {
   title?: ReactNode | undefined
   subtitle?: ReactNode | undefined
   expanded?: boolean | undefined
   children?: TreeItem[] | GetTreeItemChildrenFn | undefined
+  id: TreeNodeId
   [x: string]: any
+}
+
+export interface SelectedNode {
+  selectedNodesList: TreeNodeId[]
+  isNodeSelected: boolean
+  node: TreeItem
 }
 
 export interface TreeNode {

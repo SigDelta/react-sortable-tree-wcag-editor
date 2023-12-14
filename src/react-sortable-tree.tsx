@@ -36,7 +36,7 @@ import {
   toggleExpandedForAll,
   walk,
 } from './utils/tree-data-utils'
-
+import { TreeNodeId } from './types/treeNode'
 let treeIdCounter = 1
 
 const mergeTheme = (props) => {
@@ -368,7 +368,6 @@ class ReactSortableTree extends Component {
       if (this.props.onSelectionChange) {
         this.props.onSelectionChange(selectedNodesInfo)
       }
-
       return selectedNodesInfo.selectedNodesList
     })
   }
@@ -645,24 +644,24 @@ class ReactSortableTree extends Component {
       draggedNodes: this.state.draggedNodes,
     })
 
-    if (this.props.selectedNodes.length > 0) {
-      this.handleUpdateSelectedNodes((prevSelectedNodes) => {
-        const parentPath = path.slice(0, -1)
-        const getNodePath = (nodeItem) => [
-          ...parentPath,
-          this.props.getNodeKey({ node: nodeItem }),
-        ]
+    // if (this.props.selectedNodes.length > 0) {
+    //   this.handleUpdateSelectedNodes((prevSelectedNodes) => {
+    //     const parentPath = path.slice(0, -1)
+    //     const getNodePath = (nodeItem) => [
+    //       ...parentPath,
+    //       this.props.getNodeKey({ node: nodeItem }),
+    //     ]
 
-        const newNodes = prevSelectedNodes.map((prevNode) => {
-          return {
-            ...prevNode,
-            path: getNodePath(prevNode),
-          }
-        })
+    //     const newNodes = prevSelectedNodes.map((prevNode) => {
+    //       return {
+    //         ...prevNode,
+    //         path: getNodePath(prevNode),
+    //       }
+    //     })
 
-        return { selectedNodesList: newNodes }
-      })
-    }
+    //     return { selectedNodesList: newNodes }
+    //   })
+    // }
 
     this.props.onChange(treeData)
 
