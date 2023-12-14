@@ -247,7 +247,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
   )
 
   return (
-    <div style={{ height: '100%' }} {...otherProps} onClick={handleSelectNode}>
+    <div style={{ height: '100%' }} {...otherProps}>
       {toggleChildrenVisibility &&
         node.children &&
         (node.children.length > 0 || typeof node.children === 'function') && (
@@ -299,9 +299,11 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
               ...style,
             }}>
             {handle}
-            {areMultipleNodesBeingDragged
-              ? multipleDraggedNodesPreview
-              : draggedNodePreview}
+            <div onClick={handleSelectNode} style={{ userSelect: 'none' }}>
+              {areMultipleNodesBeingDragged
+                ? multipleDraggedNodesPreview
+                : draggedNodePreview}
+            </div>
           </div>
         )}
       </div>
