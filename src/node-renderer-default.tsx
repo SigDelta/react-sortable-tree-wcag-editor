@@ -164,7 +164,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
 
   const handleSelectNode = () => {
     if (isAnyParentSelected && !isSelected) {
-      // TODO invert the condition?
+      // TODO invert the condition
     } else {
       updateSelectedNodes((prevNodesList) => {
         const updatedNodesList = isSelected

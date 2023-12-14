@@ -391,17 +391,16 @@ class ReactSortableTree extends Component {
   startDrag = ({ path, node }) => {
     this.setState((prevState) => {
       const { getNodeKey } = this.props
-      const nodeKey = getNodeKey({ node })
+      const nodeKey = getNodeKey(node.id)
       const multipleNodes = this.props.selectedNodes.length > 1
       const isOneOfSelectedNodes = this.props.selectedNodes.some(
         (selectedNode) => getNodeKey({ node: selectedNode }) === nodeKey
       )
-
-      const isOneofParentNodes = (assumedParentNode: TreeItem) => {
+      const isOneofParentNodes = (assumedParentNodeId: TreeNodeId) => {
         const pathElements = path.slice(0, -1)
 
         return pathElements.some(
-          (pathCrumb) => pathCrumb === getNodeKey({ node: assumedParentNode })
+          (pathCrumb) => pathCrumb === getNodeKey(assumedParentNodeId)
         )
       }
 
@@ -424,10 +423,7 @@ class ReactSortableTree extends Component {
         draggingTreeData = removedDraggedNodeTreeData
 
         for (const selectedNode of this.props.selectedNodes) {
-          if (
-            getNodeKey({ node: selectedNode }) ===
-            getNodeKey({ node: draggedNode })
-          ) {
+          if (getNodeKey(selectedNode.id) === getNodeKey(draggedNode.id)) {
             continue
           }
 
@@ -437,7 +433,7 @@ class ReactSortableTree extends Component {
               getNodeKey,
               treeData: draggingTreeData,
               searchMethod: (data) =>
-                getNodeKey({ node: selectedNode }) === getNodeKey(data),
+                getNodeKey(selectedNode.id) === getNodeKey(data.id),
             })
 
             const { treeData } = this.removeNodeAtPath(
