@@ -1012,6 +1012,9 @@ export type ReactSortableTreeProps = {
   // By default, returns the index in the tree (omitting hidden nodes).
   getNodeKey?: (node) => string
 
+  setSelectedNodes?: (nodeIds: TreeNodeId[]) => void
+  selectedNodes?: TreeNodeId
+
   // Called whenever tree data changed.
   // Just like with React input elements, you have to update your
   // own component's data to see the changes reflected.
