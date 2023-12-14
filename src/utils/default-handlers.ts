@@ -18,7 +18,7 @@ export interface TreeItem {
   title?: ReactNode | undefined
   subtitle?: ReactNode | undefined
   expanded?: boolean | undefined
-  children?: TreeItem[] | GetTreeItemChildrenFn | undefined
+  children?: TreeItem[] | undefined
   id: TreeNodeId
   [x: string]: any
 }

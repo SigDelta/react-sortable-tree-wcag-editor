@@ -42,7 +42,7 @@ export interface NodeRendererProps {
   listIndex: number
   treeId: string
   rowDirection?: 'ltr' | 'rtl' | string | undefined
-  selectedNodes: TreeItem[]
+  selectedNodes: TreeNodeId[]
 
   connectDragPreview: ConnectDragPreview
   connectDragSource: ConnectDragSource
@@ -104,24 +104,20 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
     )
   }
 
-  // const isOneofChildNodes = (
-  //   assumedChildNode: TreeItem,
-  //   testedNode: TreeItem
-  // ): boolean => {
-  //   if (assumedChildNode.path) {
-  //     return isOneofParentNodes(testedNode, assumedChildNode.path)
-  //   }
-
-  //   return (
-  //     find({
-  //       treeData: [testedNode],
-  //       searchMethod(data) {
-  //         return getNodeKey(data) === getNodeKey({ node: assumedChildNode })
-  //       },
-  //       getNodeKey,
-  //     }).matches.length === 1
-  //   )
-  // }
+  const isOneofChildNodes = (
+    assumedChildNodeId: TreeNodeId,
+    testedNode: TreeItem
+  ): boolean => {
+    if (testedNode.children) {
+      for (const childNode of testedNode.children) {
+        if (childNode.id === assumedChildNodeId) return true
+        if (isOneofChildNodes(assumedChildNodeId, childNode)) {
+          return true
+        }
+      }
+    }
+    return false
+  }
 
   const isAnyParentSelected = selectedNodes.some((selectedNode) =>
     isOneofParentNodes(selectedNode, path)
@@ -176,9 +172,12 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
               (selectedNodeId) => !(getNodeKey(selectedNodeId) === nodeKey)
             )
           : [
-              ...prevNodesList.filter((prevNodeId) =>
-                isOneofParentNodes(prevNodeId, path)
-              ),
+              ...prevNodesList.filter((prevNodeId) => {
+                const isAnyChildOrParentSelected =
+                  isOneofParentNodes(prevNodeId, path) ||
+                  isOneofChildNodes(prevNodeId, node)
+                return !isAnyChildOrParentSelected
+              }),
               node.id,
             ]
 
