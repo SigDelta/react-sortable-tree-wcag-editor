@@ -119,8 +119,8 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
     return false
   }
 
-  const isAnyParentSelected = selectedNodes.some((selectedNode) =>
-    isOneofParentNodes(selectedNode, path)
+  const isAnyParentSelected = selectedNodes.some((selectedNodeId) =>
+    isOneofParentNodes(selectedNodeId, path)
   )
 
   const nodeTitle = title || node.title
@@ -192,7 +192,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
 
   const areMultipleNodesBeingDragged =
     draggedNode &&
-    getNodeKey({ node: draggedNode }) === nodeKey &&
+    getNodeKey(draggedNode.id) === nodeKey &&
     selectedNodes.length > 1
 
   const multipleDraggedNodesPreview = (

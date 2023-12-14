@@ -394,7 +394,7 @@ class ReactSortableTree extends Component {
       const nodeKey = getNodeKey(node.id)
       const multipleNodes = this.props.selectedNodes.length > 1
       const isOneOfSelectedNodes = this.props.selectedNodes.some(
-        (selectedNode) => getNodeKey({ node: selectedNode }) === nodeKey
+        (selectedNodeId) => getNodeKey(selectedNodeId) === nodeKey
       )
       const isOneofParentNodes = (assumedParentNodeId: TreeNodeId) => {
         const pathElements = path.slice(0, -1)
@@ -422,38 +422,25 @@ class ReactSortableTree extends Component {
 
         draggingTreeData = removedDraggedNodeTreeData
 
-        for (const selectedNode of this.props.selectedNodes) {
-          if (getNodeKey(selectedNode.id) === getNodeKey(draggedNode.id)) {
+        for (const selectedNodeId of this.props.selectedNodes) {
+          if (getNodeKey(selectedNodeId) === getNodeKey(draggedNode.id)) {
             continue
           }
 
-          if (!selectedNode.path) {
-            // TODO clean up
-            const foundNode = findNode({
-              getNodeKey,
-              treeData: draggingTreeData,
-              searchMethod: (data) =>
-                getNodeKey(selectedNode.id) === getNodeKey(data.id),
-            })
-
-            const { treeData } = this.removeNodeAtPath(
-              draggingTreeData,
-              foundNode.path
-            )
-
-            draggingTreeData = treeData
-
-            continue
-          }
+          const foundNode = findNode({
+            getNodeKey,
+            treeData: draggingTreeData,
+            searchMethod: (data) =>
+              getNodeKey(selectedNodeId) === getNodeKey(data.node.id),
+          })
 
           const { treeData } = this.removeNodeAtPath(
             draggingTreeData,
-            selectedNode.path
+            foundNode.path
           )
 
           draggingTreeData = treeData
         }
-
         return {
           draggingTreeData,
           draggedNode,
@@ -493,14 +480,24 @@ class ReactSortableTree extends Component {
     }
 
     this.setState(({ draggingTreeData, instanceProps }) => {
+      const { getNodeKey } = this.props
+      const findNode = (config) => find(config).matches[0]
       // Fall back to the tree data if something is being dragged in from
       //  an external element
       const newDraggingTreeData = draggingTreeData || instanceProps.treeData
 
-      const draggedNodes = this.props.selectedNodes.map((node) => ({
-        node,
-        path: node.path,
-      }))
+      const draggedNodes = this.props.selectedNodes.map((nodeId) => {
+        const foundNode = findNode({
+          getNodeKey,
+          treeData: instanceProps.treeData,
+          searchMethod: (data) =>
+            getNodeKey(nodeId) === getNodeKey(data.node.id),
+        })
+        return {
+          node: foundNode.node,
+          path: foundNode.path,
+        }
+      })
 
       const addedResult = memoizedInsertNode({
         treeData: newDraggingTreeData,
