@@ -2,7 +2,8 @@ import React from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
 import { classnames } from './utils/classnames'
 import './node-renderer-default.css'
-import { NodeData, SelectedNode, TreeItem, TreeNodeId, find } from '.'
+import { NodeData, SelectedNode, TreeItem } from '.'
+import { TreeNodeId } from './utils/default-handlers'
 
 const defaultProps = {
   isSearchMatch: false,

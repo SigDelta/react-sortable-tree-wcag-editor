@@ -19,6 +19,7 @@ import { classnames } from './utils/classnames'
 import {
   defaultGetNodeKey,
   defaultSearchMethod,
+  TreeNodeId,
 } from './utils/default-handlers'
 import { wrapPlaceholder, wrapSource, wrapTarget } from './utils/dnd-manager'
 import { slideRows } from './utils/generic-utils'
@@ -36,7 +37,6 @@ import {
   toggleExpandedForAll,
   walk,
 } from './utils/tree-data-utils'
-import { TreeNodeId } from './types/treeNode'
 let treeIdCounter = 1
 
 const mergeTheme = (props) => {
