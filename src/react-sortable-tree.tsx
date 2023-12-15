@@ -787,13 +787,14 @@ class ReactSortableTree extends Component {
           })
           return foundNode.node
         })
-        swapLength = 0;
+        swapLength = 0
 
         for (let i = 0; i < draggedNodes.length; i++) {
-          let nodeSwapLength = 1 + memoizedGetDescendantCount({ node: draggedNodes[i] });
-        swapLength += nodeSwapLength;
+          let nodeSwapLength =
+            1 + memoizedGetDescendantCount({ node: draggedNodes[i] })
+          swapLength += nodeSwapLength
         }
-        
+
         const addedResult = memoizedInsertNode({
           treeData,
           newNode: draggedNode,
@@ -803,7 +804,6 @@ class ReactSortableTree extends Component {
           getNodeKey,
         })
 
-        
         const swapTo = draggedMinimumTreeIndex
         swapFrom = addedResult.treeIndex
         rows = slideRows(
@@ -812,7 +812,6 @@ class ReactSortableTree extends Component {
           swapTo,
           swapLength
         )
-        console.log(rows)
       } else {
         const addedResult = memoizedInsertNode({
           treeData,
@@ -832,7 +831,6 @@ class ReactSortableTree extends Component {
           swapTo,
           swapLength
         )
-        console.log(rows)
       }
     } else {
       rows = this.getRows(treeData)
