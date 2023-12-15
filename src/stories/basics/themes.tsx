@@ -30,24 +30,20 @@ const data = [
   {
     title: (
       <div>
-        Simply set it to the <code>theme</code> prop and you&rsquo;re
-        done!
+        Simply set it to the <code>theme</code> prop and you&rsquo;re done!
       </div>
     ),
   },
-];
+]
 
 const Themes: React.FC = () => {
-  const [treeData, setTreeData] = useState(data);
+  const [treeData, setTreeData] = useState(data)
 
   return (
     <div style={{ height: 300, width: 700 }}>
-      <SortableTree
-        treeData={treeData}
-        onChange={setTreeData}
-      />
+      <SortableTree treeData={treeData} onChange={setTreeData} />
     </div>
   )
 }
 
-export default Themes;
+export default Themes

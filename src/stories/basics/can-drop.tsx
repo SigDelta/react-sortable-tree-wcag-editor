@@ -30,10 +30,10 @@ const data = [
     isTwin: true,
     subtitle: "Doesn't play with other twin",
   },
-];
+]
 
 const CanDrop: React.FC = () => {
-  const [treeData, setTreeData] = useState(data);
+  const [treeData, setTreeData] = useState(data)
 
   const canDrop = ({ node, nextParent, prevPath, nextPath }: any) => {
     if (prevPath.indexOf('trap') >= 0 && nextPath.indexOf('trap') < 0) {
@@ -55,14 +55,14 @@ const CanDrop: React.FC = () => {
   return (
     <div style={{ height: 300, width: 700 }}>
       <SortableTree
-          treeData={treeData}
-          canDrop={canDrop}
-          // Need to set getNodeKey to get meaningful ids in paths
-          getNodeKey={({ node }: any) => node.id}
-          onChange={setTreeData}
-        />
+        treeData={treeData}
+        canDrop={canDrop}
+        // Need to set getNodeKey to get meaningful ids in paths
+        getNodeKey={({ node }: any) => node.id}
+        onChange={setTreeData}
+      />
     </div>
   )
 }
 
-export default CanDrop;
+export default CanDrop

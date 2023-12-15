@@ -13,24 +13,21 @@ const dndBackend = isTouchDevice ? TouchBackend : HTML5Backend
 const TouchSupport: React.FC = () => {
   const [treeData, setTreeData] = useState([
     { title: 'Chicken', expanded: true, children: [{ title: 'Egg' }] },
-  ]);
+  ])
 
   return (
     <DndProvider backend={dndBackend}>
-        <div>
-          <span>
-            This is {!isTouchDevice && 'not '}a touch-supporting browser
-          </span>
+      <div>
+        <span>
+          This is {!isTouchDevice && 'not '}a touch-supporting browser
+        </span>
 
-          <div style={{ height: 300, width: 700 }}>
-            <SortableTree
-              treeData={treeData}
-              onChange={setTreeData}
-            />
-          </div>
+        <div style={{ height: 300, width: 700 }}>
+          <SortableTree treeData={treeData} onChange={setTreeData} />
         </div>
-      </DndProvider>
+      </div>
+    </DndProvider>
   )
 }
 
-export default TouchSupport;
+export default TouchSupport

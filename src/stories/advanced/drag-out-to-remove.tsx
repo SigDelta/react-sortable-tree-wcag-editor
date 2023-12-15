@@ -15,7 +15,10 @@ const trashAreaSpec = {
   // The endDrag handler on the tree source will use some of the properties of
   // the source, like node, treeIndex, and path to determine where it was before.
   // The treeId must be changed, or it interprets it as dropping within itself.
-  drop: (props: any, monitor: any) => ({ ...monitor.getItem(), treeId: 'trash' }),
+  drop: (props: any, monitor: any) => ({
+    ...monitor.getItem(),
+    treeId: 'trash',
+  }),
 }
 const trashAreaCollect = (connect: any, monitor: any) => ({
   connectDropTarget: connect.dropTarget(),
@@ -53,7 +56,7 @@ const DragOutToRemove: React.FC = () => {
     { title: '2' },
     { title: '3' },
     { title: '4', expanded: true, children: [{ title: '5' }] },
-  ]);
+  ])
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -72,4 +75,4 @@ const DragOutToRemove: React.FC = () => {
   )
 }
 
-export default DragOutToRemove;
+export default DragOutToRemove

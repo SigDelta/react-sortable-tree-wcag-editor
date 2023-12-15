@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
-import { SortableTree, addNodeUnderParent, removeNodeAtPath } from '../../../src'
+import {
+  SortableTree,
+  addNodeUnderParent,
+  removeNodeAtPath,
+} from '../../../src'
 // In your own app, you would need to use import styles once in the app
 // import 'react-sortable-tree/styles.css';
 
@@ -55,11 +59,15 @@ const firstNames = [
 ]
 
 const AddRemove: React.FC = () => {
-  const [treeData, setTreeData] = useState<any>([{ title: 'Peter Olofsson' }, { title: 'Karl Johansson' }]);
-  const [addAsFirstChild, setAddAsFirstChild] = useState(false);
+  const [treeData, setTreeData] = useState<any>([
+    { title: 'Peter Olofsson' },
+    { title: 'Karl Johansson' },
+  ])
+  const [addAsFirstChild, setAddAsFirstChild] = useState(false)
 
-  const getNodeKey = ({ treeIndex }: { treeIndex: number }) => treeIndex;
-  const getRandomName = () => firstNames[Math.floor(Math.random() * firstNames.length)];
+  const getNodeKey = ({ treeIndex }: { treeIndex: number }) => treeIndex
+  const getRandomName = () =>
+    firstNames[Math.floor(Math.random() * firstNames.length)]
 
   return (
     <div>
@@ -78,12 +86,13 @@ const AddRemove: React.FC = () => {
                       expandParent: true,
                       getNodeKey,
                       newNode: {
-                        title: `${getRandomName()} ${node.title.split(' ')[0]
-                          }sson`,
+                        title: `${getRandomName()} ${
+                          node.title.split(' ')[0]
+                        }sson`,
                       },
                       addAsFirstChild,
                     }).treeData
-                  );
+                  )
                 }}>
                 Add Child
               </button>,
@@ -95,7 +104,7 @@ const AddRemove: React.FC = () => {
                       path,
                       getNodeKey,
                     })
-                  );
+                  )
                 }}>
                 Remove
               </button>,
@@ -109,7 +118,7 @@ const AddRemove: React.FC = () => {
             treeData.concat({
               title: `${getRandomName()} ${getRandomName()}sson`,
             })
-          );
+          )
         }}>
         Add more
       </button>
@@ -129,4 +138,4 @@ const AddRemove: React.FC = () => {
   )
 }
 
-export default AddRemove;
+export default AddRemove

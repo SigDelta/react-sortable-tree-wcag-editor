@@ -254,6 +254,7 @@ export const wrapTarget = (
         if (!item || !monitor.isOver()) {
           return
         }
+
         dragHover({
           node: draggedNode,
           path: item.path,

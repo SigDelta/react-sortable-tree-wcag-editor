@@ -11,12 +11,12 @@ const data = [
     position: 'Striker',
     children: [{ id: 4, position: 'Full-back' }],
   },
-];
+]
 
 const TEAM_COLORS = ['Red', 'Black', 'Green', 'Blue']
 
 const GenerateNodeProps: React.FC = () => {
-  const [treeData, setTreeData] = useState<any>(data);
+  const [treeData, setTreeData] = useState<any>(data)
 
   const getNodeKey = ({ node: { id } }: any) => id
 
@@ -47,8 +47,9 @@ const GenerateNodeProps: React.FC = () => {
                   ? `1px 1px 1px ${playerColor.toLowerCase()}`
                   : 'none',
             },
-            title: `${playerColor} ${path.length === 1 ? 'Captain' : node.position
-              }`,
+            title: `${playerColor} ${
+              path.length === 1 ? 'Captain' : node.position
+            }`,
             onClick: () => {
               setTreeData(
                 changeNodeAtPath({
@@ -56,7 +57,7 @@ const GenerateNodeProps: React.FC = () => {
                   path,
                   getNodeKey,
                   newNode: { ...node, expanded: !node.expanded },
-                }),
+                })
               )
             },
           }
@@ -66,4 +67,4 @@ const GenerateNodeProps: React.FC = () => {
   )
 }
 
-export default GenerateNodeProps;
+export default GenerateNodeProps

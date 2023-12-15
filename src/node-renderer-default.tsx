@@ -1,9 +1,8 @@
 import React from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
 import { classnames } from './utils/classnames'
-import { isDescendant } from './utils/tree-data-utils'
 import './node-renderer-default.css'
-import { NodeData, TreeItem } from '.'
+import { NodeData, SelectedNode, TreeItem, TreeNodeId, find } from '.'
 
 const defaultProps = {
   isSearchMatch: false,
@@ -43,11 +42,15 @@ export interface NodeRendererProps {
   listIndex: number
   treeId: string
   rowDirection?: 'ltr' | 'rtl' | string | undefined
+  selectedNodes: TreeNodeId[]
 
   connectDragPreview: ConnectDragPreview
   connectDragSource: ConnectDragSource
+  updateSelectedNodes: (
+    inputFn: (selectedNodes: TreeNodeId[]) => SelectedNode[]
+  ) => void
   parentNode?: TreeItem | undefined
-  startDrag: ({ path }: { path: number[] }) => void
+  startDrag: ({ path }: { path: number[] | number[][] }) => void
   endDrag: (dropResult: unknown) => void
   isDragging: boolean
   didDrop: boolean
@@ -83,11 +86,50 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
     isOver: _isOver, // Not needed, but preserved for other renderers
     parentNode: _parentNode, // Needed for dndManager
     rowDirection,
+    updateSelectedNodes,
+    selectedNodes,
+    getNodeKey,
+    isDraggedDescendant,
     ...otherProps
   } = props
+
+  const isOneofParentNodes = (
+    assumedParentNodeId: TreeNodeId,
+    nodePath: ReturnType<typeof getNodeKey>[]
+  ) => {
+    const pathElements = nodePath.slice(0, -1)
+
+    return pathElements.some(
+      (pathCrumb) => pathCrumb === getNodeKey(assumedParentNodeId)
+    )
+  }
+
+  const isOneofChildNodes = (
+    assumedChildNodeId: TreeNodeId,
+    testedNode: TreeItem
+  ): boolean => {
+    if (testedNode.children) {
+      for (const childNode of testedNode.children) {
+        if (childNode.id === assumedChildNodeId) return true
+        if (isOneofChildNodes(assumedChildNodeId, childNode)) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  const isAnyParentSelected = selectedNodes.some((selectedNodeId) =>
+    isOneofParentNodes(selectedNodeId, path)
+  )
+
   const nodeTitle = title || node.title
   const nodeSubtitle = subtitle || node.subtitle
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
+  const nodeKey = getNodeKey(node.id)
+  const isSelected = selectedNodes.some(
+    (selectedNodeId) => getNodeKey(selectedNodeId) === nodeKey
+  )
 
   let handle
   if (canDrag) {
@@ -113,13 +155,95 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
       )
   }
 
-  const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node)
   const isLandingPadActive = !didDrop && isDragging
 
   let buttonStyle = { left: -0.5 * scaffoldBlockPxWidth, right: 0 }
   if (rowDirection === 'rtl') {
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth, left: 0 }
   }
+
+  const handleSelectNode = () => {
+    if (isAnyParentSelected && !isSelected) {
+      // TODO invert the condition
+    } else {
+      updateSelectedNodes((prevNodesList) => {
+        const updatedNodesList = isSelected
+          ? prevNodesList.filter(
+              (selectedNodeId) => !(getNodeKey(selectedNodeId) === nodeKey)
+            )
+          : [
+              ...prevNodesList.filter((prevNodeId) => {
+                const isAnyChildOrParentSelected =
+                  isOneofParentNodes(prevNodeId, path) ||
+                  isOneofChildNodes(prevNodeId, node)
+                return !isAnyChildOrParentSelected
+              }),
+              node.id,
+            ]
+
+        return {
+          selectedNodesList: updatedNodesList,
+          isNodeSelected: !isSelected,
+          node,
+        }
+      })
+    }
+  }
+
+  const areMultipleNodesBeingDragged =
+    draggedNode &&
+    getNodeKey(draggedNode.id) === nodeKey &&
+    selectedNodes.length > 1
+
+  const multipleDraggedNodesPreview = (
+    <div>Multiple nodes are being dragged...</div>
+  )
+
+  const draggedNodePreview = (
+    <div
+      className={classnames(
+        'rst__rowContents',
+        canDrag ? '' : 'rst__rowContentsDragDisabled',
+        isSelected || isAnyParentSelected ? 'rst__rowContentsSelected' : '',
+        rowDirectionClass ?? ''
+      )}>
+      <div className={classnames('rst__rowLabel', rowDirectionClass ?? '')}>
+        <span
+          className={classnames(
+            'rst__rowTitle',
+            node.subtitle ? 'rst__rowTitleWithSubtitle' : ''
+          )}>
+          {typeof nodeTitle === 'function'
+            ? nodeTitle({
+                node,
+                path,
+                treeIndex,
+              })
+            : nodeTitle}
+        </span>
+
+        {nodeSubtitle && (
+          <span className="rst__rowSubtitle">
+            {typeof nodeSubtitle === 'function'
+              ? nodeSubtitle({
+                  node,
+                  path,
+                  treeIndex,
+                })
+              : nodeSubtitle}
+          </span>
+        )}
+      </div>
+
+      <div className="rst__rowToolbar">
+        {buttons?.map((btn, index) => (
+          <div key={index} className="rst__toolbarButton">
+            {btn}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <div style={{ height: '100%' }} {...otherProps}>
@@ -174,52 +298,10 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
               ...style,
             }}>
             {handle}
-
-            <div
-              className={classnames(
-                'rst__rowContents',
-                canDrag ? '' : 'rst__rowContentsDragDisabled',
-                rowDirectionClass ?? ''
-              )}>
-              <div
-                className={classnames(
-                  'rst__rowLabel',
-                  rowDirectionClass ?? ''
-                )}>
-                <span
-                  className={classnames(
-                    'rst__rowTitle',
-                    node.subtitle ? 'rst__rowTitleWithSubtitle' : ''
-                  )}>
-                  {typeof nodeTitle === 'function'
-                    ? nodeTitle({
-                        node,
-                        path,
-                        treeIndex,
-                      })
-                    : nodeTitle}
-                </span>
-
-                {nodeSubtitle && (
-                  <span className="rst__rowSubtitle">
-                    {typeof nodeSubtitle === 'function'
-                      ? nodeSubtitle({
-                          node,
-                          path,
-                          treeIndex,
-                        })
-                      : nodeSubtitle}
-                  </span>
-                )}
-              </div>
-
-              <div className="rst__rowToolbar">
-                {buttons?.map((btn, index) => (
-                  <div key={index} className="rst__toolbarButton">
-                    {btn}
-                  </div>
-                ))}
-              </div>
+            <div onClick={handleSelectNode} style={{ userSelect: 'none' }}>
+              {areMultipleNodesBeingDragged
+                ? multipleDraggedNodesPreview
+                : draggedNodePreview}
             </div>
           </div>
         )}
