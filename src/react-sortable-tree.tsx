@@ -770,29 +770,70 @@ class ReactSortableTree extends Component {
     const treeData = draggingTreeData || instanceProps.treeData
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
 
+    const findNode = (config) => find(config).matches[0]
+
     let rows
     let swapFrom
     let swapLength
 
     if (draggedNode && draggedMinimumTreeIndex !== undefined) {
-      const addedResult = memoizedInsertNode({
-        treeData,
-        newNode: draggedNode,
-        depth: draggedDepth,
-        minimumTreeIndex: draggedMinimumTreeIndex,
-        expandParent: true,
-        getNodeKey,
-      })
+      if (this.props.selectedNodes.length > 1) {
+        const draggedNodes = this.props.selectedNodes.map((nodeId) => {
+          const foundNode = findNode({
+            getNodeKey,
+            treeData: instanceProps.treeData,
+            searchMethod: (data) =>
+              getNodeKey(nodeId) === getNodeKey(data.node.id),
+          })
+          return foundNode.node
+        })
+        swapLength = 0;
 
-      const swapTo = draggedMinimumTreeIndex
-      swapFrom = addedResult.treeIndex
-      swapLength = 1 + memoizedGetDescendantCount({ node: draggedNode })
-      rows = slideRows(
-        this.getRows(addedResult.treeData),
-        swapFrom,
-        swapTo,
-        swapLength
-      )
+        for (let i = 0; i < draggedNodes.length; i++) {
+          let nodeSwapLength = 1 + memoizedGetDescendantCount({ node: draggedNodes[i] });
+        swapLength += nodeSwapLength;
+        }
+        
+        const addedResult = memoizedInsertNode({
+          treeData,
+          newNode: draggedNode,
+          depth: draggedDepth,
+          minimumTreeIndex: draggedMinimumTreeIndex,
+          expandParent: true,
+          getNodeKey,
+        })
+
+        
+        const swapTo = draggedMinimumTreeIndex
+        swapFrom = addedResult.treeIndex
+        rows = slideRows(
+          this.getRows(addedResult.treeData),
+          swapFrom,
+          swapTo,
+          swapLength
+        )
+        console.log(rows)
+      } else {
+        const addedResult = memoizedInsertNode({
+          treeData,
+          newNode: draggedNode,
+          depth: draggedDepth,
+          minimumTreeIndex: draggedMinimumTreeIndex,
+          expandParent: true,
+          getNodeKey,
+        })
+
+        const swapTo = draggedMinimumTreeIndex
+        swapFrom = addedResult.treeIndex
+        swapLength = 1 + memoizedGetDescendantCount({ node: draggedNode })
+        rows = slideRows(
+          this.getRows(addedResult.treeData),
+          swapFrom,
+          swapTo,
+          swapLength
+        )
+        console.log(rows)
+      }
     } else {
       rows = this.getRows(treeData)
     }
