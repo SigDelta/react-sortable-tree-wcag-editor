@@ -10,8 +10,6 @@ export interface GetTreeItemChildren {
 
 export type GetTreeItemChildrenFn = (data: GetTreeItemChildren) => void
 
-export type GetNodeKeyFunction = (data: TreeIndex & TreeNode) => string | number
-
 export type TreeNodeId = number | string
 
 export interface TreeItem {
@@ -19,7 +17,7 @@ export interface TreeItem {
   subtitle?: ReactNode | undefined
   expanded?: boolean | undefined
   children?: TreeItem[] | undefined
-  id: TreeNodeId
+  nodeId: TreeNodeId
   [x: string]: any
 }
 
@@ -50,8 +48,6 @@ export interface NodeData extends TreeNode, TreePath, TreeIndex {}
 export interface SearchData extends NodeData {
   searchQuery: string
 }
-
-export const defaultGetNodeKey = ({ treeIndex }: TreeIndex) => treeIndex
 
 // Cheap hack to get the text of a react object
 const getReactElementText = (parent: any) => {

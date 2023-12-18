@@ -26,10 +26,10 @@ const TreeDataIO: React.FC = () => {
 
   const flatData = getFlatDataFromTree({
     treeData,
-    getNodeKey: ({ node }) => node.id, // This ensures your "id" properties are exported in the path
+    getNodeKey: ({ node }) => node.nodeId, // This ensures your "id" properties are exported in the path
     ignoreCollapsed: false, // Makes sure you traverse every node in the tree, not just the visible ones
   }).map(({ node, path }) => ({
-    id: node.id,
+    id: node.nodeId,
     name: node.name,
 
     // The last entry in the path is this node's key

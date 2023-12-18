@@ -16,11 +16,7 @@ import './react-sortable-tree.css'
 import TreeNode from './tree-node'
 import TreePlaceholder from './tree-placeholder'
 import { classnames } from './utils/classnames'
-import {
-  defaultGetNodeKey,
-  defaultSearchMethod,
-  TreeNodeId,
-} from './utils/default-handlers'
+import { defaultSearchMethod, TreeNodeId } from './utils/default-handlers'
 import { wrapPlaceholder, wrapSource, wrapTarget } from './utils/dnd-manager'
 import { slideRows } from './utils/generic-utils'
 import {
@@ -74,7 +70,6 @@ class ReactSortableTree extends Component {
   static search(props, state, seekIndex, expand, singleSearch) {
     const {
       onChange,
-      getNodeKey,
       searchFinishCallback,
       searchQuery,
       searchMethod,
@@ -97,7 +92,6 @@ class ReactSortableTree extends Component {
 
     // if onlyExpandSearchedNodes collapse the tree and search
     const { treeData: expandedTreeData, matches: searchMatches } = find({
-      getNodeKey,
       treeData: onlyExpandSearchedNodes
         ? toggleExpandedForAll({
             treeData: instanceProps.treeData,
@@ -143,7 +137,6 @@ class ReactSortableTree extends Component {
 
     walk({
       treeData: instanceProps.treeData,
-      getNodeKey: props.getNodeKey,
       callback: ({ node, path, lowerSiblingCounts, treeIndex }) => {
         // If the node has children defined by a function, and is either expanded
         //  or set to load even before expansion, run the function.
@@ -174,7 +167,6 @@ class ReactSortableTree extends Component {
                           children: childrenArray,
                         }
                       : oldNode,
-                  getNodeKey: props.getNodeKey,
                 })
               ),
           })
@@ -375,7 +367,6 @@ class ReactSortableTree extends Component {
   getRows(treeData) {
     return memoizedGetFlatDataFromTree({
       ignoreCollapsed: true,
-      getNodeKey: this.props.getNodeKey,
       treeData,
     })
   }
@@ -384,23 +375,21 @@ class ReactSortableTree extends Component {
     return removeNode({
       treeData,
       path: nodePath,
-      getNodeKey: this.props.getNodeKey,
     })
   }
 
   startDrag = ({ path, node }) => {
     this.setState((prevState) => {
-      const { getNodeKey } = this.props
-      const nodeKey = getNodeKey(node.id)
+      const nodeKey = node.nodeId
       const multipleNodes = this.props.selectedNodes.length > 1
       const isOneOfSelectedNodes = this.props.selectedNodes.some(
-        (selectedNodeId) => getNodeKey(selectedNodeId) === nodeKey
+        (selectedNodeId) => selectedNodeId === nodeKey
       )
       const isOneofParentNodes = (assumedParentNodeId: TreeNodeId) => {
         const pathElements = path.slice(0, -1)
 
         return pathElements.some(
-          (pathCrumb) => pathCrumb === getNodeKey(assumedParentNodeId)
+          (pathCrumb) => pathCrumb === assumedParentNodeId
         )
       }
 
@@ -423,15 +412,13 @@ class ReactSortableTree extends Component {
         draggingTreeData = removedDraggedNodeTreeData
 
         for (const selectedNodeId of this.props.selectedNodes) {
-          if (getNodeKey(selectedNodeId) === getNodeKey(draggedNode.id)) {
+          if (selectedNodeId === draggedNode.nodeId) {
             continue
           }
 
           const foundNode = findNode({
-            getNodeKey,
             treeData: draggingTreeData,
-            searchMethod: (data) =>
-              getNodeKey(selectedNodeId) === getNodeKey(data.node.id),
+            searchMethod: (data) => selectedNodeId === data.node.nodeId,
           })
 
           const { treeData } = this.removeNodeAtPath(
@@ -480,7 +467,6 @@ class ReactSortableTree extends Component {
     }
 
     this.setState(({ draggingTreeData, instanceProps }) => {
-      const { getNodeKey } = this.props
       const findNode = (config) => find(config).matches[0]
       // Fall back to the tree data if something is being dragged in from
       //  an external element
@@ -488,10 +474,8 @@ class ReactSortableTree extends Component {
 
       const draggedNodes = this.props.selectedNodes.map((nodeId) => {
         const foundNode = findNode({
-          getNodeKey,
           treeData: instanceProps.treeData,
-          searchMethod: (data) =>
-            getNodeKey(nodeId) === getNodeKey(data.node.id),
+          searchMethod: (data) => nodeId === data.node.nodeId,
         })
         return {
           node: foundNode.node,
@@ -506,7 +490,6 @@ class ReactSortableTree extends Component {
         depth: draggedDepth,
         minimumTreeIndex: draggedMinimumTreeIndex,
         expandParent: true,
-        getNodeKey: this.props.getNodeKey,
       })
 
       const rows = this.getRows(addedResult.treeData)
@@ -520,7 +503,6 @@ class ReactSortableTree extends Component {
           treeData: newDraggingTreeData,
           path: expandedParentPath.slice(0, -1),
           newNode: ({ node }) => ({ ...node, expanded: true }),
-          getNodeKey: this.props.getNodeKey,
         }),
         draggedNodes: draggedNodes || [],
         // reset the scroll focus so it doesn't jump back
@@ -564,7 +546,6 @@ class ReactSortableTree extends Component {
           treeData: instanceProps.treeData, // use treeData unaltered by the drag operation
           path,
           newNode: ({ node: copyNode }) => ({ ...copyNode }), // create a shallow copy of the node
-          getNodeKey: this.props.getNodeKey,
         })
       }
 
@@ -602,7 +583,6 @@ class ReactSortableTree extends Component {
       treeData: instanceProps.treeData,
       path,
       newNode: ({ node }) => ({ ...node, expanded: !node.expanded }),
-      getNodeKey: this.props.getNodeKey,
     })
 
     this.props.onChange(treeData)
@@ -633,7 +613,6 @@ class ReactSortableTree extends Component {
       depth,
       minimumTreeIndex,
       expandParent: true,
-      getNodeKey: this.props.getNodeKey,
       draggedNodes: this.state.draggedNodes,
     })
 
@@ -738,7 +717,6 @@ class ReactSortableTree extends Component {
           toggleChildrenVisibility={this.toggleChildrenVisibility}
           updateSelectedNodes={this.handleUpdateSelectedNodes}
           selectedNodes={this.props.selectedNodes}
-          getNodeKey={this.props.getNodeKey}
           {...sharedProps}
           {...nodeProps}
         />
@@ -753,7 +731,6 @@ class ReactSortableTree extends Component {
       className,
       innerStyle,
       placeholderRenderer,
-      getNodeKey,
       rowDirection,
     } = mergeTheme(this.props)
 
@@ -781,7 +758,6 @@ class ReactSortableTree extends Component {
         depth: draggedDepth,
         minimumTreeIndex: draggedMinimumTreeIndex,
         expandParent: true,
-        getNodeKey,
       })
 
       const swapTo = draggedMinimumTreeIndex
@@ -1010,7 +986,6 @@ export type ReactSortableTreeProps = {
   // Determine the unique key used to identify each node and
   // generate the `path` array passed in callbacks.
   // By default, returns the index in the tree (omitting hidden nodes).
-  getNodeKey?: (node) => string
 
   setSelectedNodes?: (nodeIds: TreeNodeId[]) => void
   selectedNodes?: TreeNodeId[]
@@ -1065,7 +1040,6 @@ ReactSortableTree.defaultProps = {
   className: '',
   dndType: undefined,
   generateNodeProps: undefined,
-  getNodeKey: defaultGetNodeKey,
   innerStyle: {},
   maxDepth: undefined,
   treeNodeRenderer: undefined,
