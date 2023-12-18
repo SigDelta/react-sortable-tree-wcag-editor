@@ -2,7 +2,7 @@ import React, { Children, Component, cloneElement } from 'react'
 import { ConnectDropTarget } from 'react-dnd'
 import { classnames } from './utils/classnames'
 import './tree-node.css'
-import { TreeItem, TreePath } from '.'
+import { TreeItem, TreeNodeId, TreePath } from '.'
 
 export interface TreeNode {
   node: TreeItem
@@ -23,6 +23,8 @@ export interface TreeRendererProps {
   lowerSiblingCounts: number[]
   rowDirection?: 'ltr' | 'rtl' | string | undefined
   rowHeight: number | ((treeIndex: number, node: any, path: any[]) => number)
+  selectedNodes: TreeNodeId[]
+  isDraggedDescendant: boolean
 
   listIndex: number
   children: JSX.Element[]

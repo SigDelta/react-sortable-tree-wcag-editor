@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { ReactSortableTreeProps, SortableTree } from '../react-sortable-tree'
 
 import { StoryFn } from '@storybook/react'
-import { TreeItem, TreeNodeId } from '../utils/default-handlers'
+import { TreeNodeId } from '../utils/default-handlers'
 
 export default {
   title: 'StructureTree',
@@ -14,44 +14,53 @@ export default {
 const data = [
   {
     title: 'Chicken',
-    id: 1,
+    nodeId: 1,
     expanded: true,
-    children: [{ title: 'Egg', id: 5 }],
+    children: [{ title: 'Egg', nodeId: 5 }],
   },
-  { title: 'Cow', id: 2, expanded: true, children: [{ title: 'Milk', id: 6 }] },
+  {
+    title: 'Cow',
+    nodeId: 2,
+    expanded: true,
+    children: [{ title: 'Milk', nodeId: 6 }],
+  },
   {
     title: 'Sheep',
-    id: 3,
+    nodeId: 3,
     expanded: true,
-    children: [{ title: 'Wool', id: 7 }],
+    children: [{ title: 'Wool', nodeId: 7 }],
   },
-  { title: 'Pig', id: 4, expanded: true, children: [{ title: 'Meet', id: 8 }] },
+  {
+    title: 'Pig',
+    nodeId: 4,
+    expanded: true,
+    children: [{ title: 'Meet', nodeId: 8 }],
+  },
   {
     title: 'Chicken 2',
-    id: 9,
+    nodeId: 9,
     expanded: true,
-    children: [{ title: 'Egg 2', id: 13 }],
+    children: [{ title: 'Egg 2', nodeId: 13 }],
   },
   {
     title: 'Cow 2',
-    id: 10,
+    nodeId: 10,
     expanded: true,
-    children: [{ title: 'Milk 2', id: 14 }],
+    children: [{ title: 'Milk 2', nodeId: 14 }],
   },
   {
     title: 'Sheep 2',
-    id: 11,
+    nodeId: 11,
     expanded: true,
-    children: [{ title: 'Wool 2', id: 15 }],
+    children: [{ title: 'Wool 2', nodeId: 15 }],
   },
   {
     title: 'Pig 2',
-    id: 12,
+    nodeId: 12,
     expanded: true,
-    children: [{ title: 'Meet 2', id: 16 }],
+    children: [{ title: 'Meet 2', nodeId: 16 }],
   },
 ]
-const getNodeKey = (nodeId: TreeNodeId) => `test-${nodeId}`
 
 const Template: StoryFn<ReactSortableTreeProps> = (args) => {
   const [treeData, setTreeData] = useState(data)
@@ -73,7 +82,6 @@ const Template: StoryFn<ReactSortableTreeProps> = (args) => {
         <SortableTree
           treeData={treeData}
           onChange={setTreeData}
-          getNodeKey={getNodeKey}
           setSelectedNodes={setSelectedNodes}
           selectedNodes={selectedNodes}
         />

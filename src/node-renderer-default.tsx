@@ -44,6 +44,7 @@ export interface NodeRendererProps {
   treeId: string
   rowDirection?: 'ltr' | 'rtl' | string | undefined
   selectedNodes: TreeNodeId[]
+  isDraggedDescendant: boolean
 
   connectDragPreview: ConnectDragPreview
   connectDragSource: ConnectDragSource
@@ -89,20 +90,16 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
     rowDirection,
     updateSelectedNodes,
     selectedNodes,
-    getNodeKey,
     isDraggedDescendant,
     ...otherProps
   } = props
 
   const isOneofParentNodes = (
     assumedParentNodeId: TreeNodeId,
-    nodePath: ReturnType<typeof getNodeKey>[]
+    nodePath: TreeNodeId[]
   ) => {
     const pathElements = nodePath.slice(0, -1)
-
-    return pathElements.some(
-      (pathCrumb) => pathCrumb === getNodeKey(assumedParentNodeId)
-    )
+    return pathElements.some((pathCrumb) => pathCrumb === assumedParentNodeId)
   }
 
   const isOneofChildNodes = (
@@ -111,7 +108,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
   ): boolean => {
     if (testedNode.children) {
       for (const childNode of testedNode.children) {
-        if (childNode.id === assumedChildNodeId) return true
+        if (childNode.nodeId === assumedChildNodeId) return true
         if (isOneofChildNodes(assumedChildNodeId, childNode)) {
           return true
         }
@@ -127,9 +124,9 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
   const nodeTitle = title || node.title
   const nodeSubtitle = subtitle || node.subtitle
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
-  const nodeKey = getNodeKey(node.id)
+  const nodeKey = node.nodeId
   const isSelected = selectedNodes.some(
-    (selectedNodeId) => getNodeKey(selectedNodeId) === nodeKey
+    (selectedNodeId) => selectedNodeId === nodeKey
   )
 
   let handle
@@ -170,7 +167,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
       updateSelectedNodes((prevNodesList) => {
         const updatedNodesList = isSelected
           ? prevNodesList.filter(
-              (selectedNodeId) => !(getNodeKey(selectedNodeId) === nodeKey)
+              (selectedNodeId) => !(selectedNodeId === nodeKey)
             )
           : [
               ...prevNodesList.filter((prevNodeId) => {
@@ -179,7 +176,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
                   isOneofChildNodes(prevNodeId, node)
                 return !isAnyChildOrParentSelected
               }),
-              node.id,
+              node.nodeId,
             ]
 
         return {
@@ -192,9 +189,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
   }
 
   const areMultipleNodesBeingDragged =
-    draggedNode &&
-    getNodeKey(draggedNode.id) === nodeKey &&
-    selectedNodes.length > 1
+    draggedNode && draggedNode.nodeId === nodeKey && selectedNodes.length > 1
 
   const multipleDraggedNodesPreview = (
     <div>Multiple nodes are being dragged...</div>

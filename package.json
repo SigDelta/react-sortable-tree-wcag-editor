@@ -1,6 +1,6 @@
 {
   "name": "react-sortable-tree-wcag-editor",
-  "version": "5.0.0",
+  "version": "5.1.1",
   "description": "Drag-and-drop sortable component for nested data and hierarchies",
   "homepage": "https://nosferatu500.github.io/react-sortable-tree",
   "main": "lib/index.js",
