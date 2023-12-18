@@ -44,6 +44,7 @@ export interface NodeRendererProps {
   treeId: string
   rowDirection?: 'ltr' | 'rtl' | string | undefined
   selectedNodes: TreeNodeId[]
+  isDraggedDescendant: boolean
 
   connectDragPreview: ConnectDragPreview
   connectDragSource: ConnectDragSource
