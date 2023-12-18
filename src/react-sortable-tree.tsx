@@ -1013,7 +1013,7 @@ export type ReactSortableTreeProps = {
   getNodeKey?: (node) => string
 
   setSelectedNodes?: (nodeIds: TreeNodeId[]) => void
-  selectedNodes?: TreeNodeId
+  selectedNodes?: TreeNodeId[]
 
   // Called whenever tree data changed.
   // Just like with React input elements, you have to update your
